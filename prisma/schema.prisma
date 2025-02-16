@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(uuid()) @map("id")
+  email             String         @unique
+  username          String         @unique
+  fullName          String
+  password          String         @map("password")
+  status            String?        @default("active") @map("status")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @default(now()) @map("updated_at")
+  deletedAt         DateTime?      @map("deleted_at")
+  role              String         @default("user")
+  refreshTokens     RefreshToken[]
+  resetToken        String?
+  resetTokenExpires DateTime?
+
+  sessions Session[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @map("id")
+  token     String   @unique
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  expiresAt DateTime @map("expires_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(uuid()) @map("id")
+  sessionId String   @unique @map("session_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  expiresAt DateTime @map("expires_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model MenuCategory {
+  id        String   @id @default(uuid()) @map("id")
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  menus     Menu[]
+}
+
+model Menu {
+  id             String        @id @default(uuid()) @map("id")
+  name           String
+  slug           String        @unique
+  price          Float
+  description    String
+  imageUrl       String?       @map("image_url")
+  status         String?       @default("available") @map("status")
+  stock          Int           @default(0)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @map("updated_at")
+  deletedAt      DateTime?     @map("deleted_at")
+  menuCategoryId String?       @map("menu_category_id")
+  menuCategory   MenuCategory? @relation(fields: [menuCategoryId], references: [id])
+}
