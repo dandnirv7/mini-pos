@@ -7,6 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id                 String    @id @default(uuid()) @map("id")
+  userId             String
+  providerType       String
+  providerId         String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  user               User      @relation(fields: [userId], references: [id])
+
+  @@unique([providerId, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid()) @map("id")
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime @map("expires")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
 model User {
   id                String         @id @default(uuid()) @map("id")
   email             String         @unique
@@ -21,25 +49,15 @@ model User {
   refreshTokens     RefreshToken[]
   resetToken        String?
   resetTokenExpires DateTime?
+  sessions          Session[]
+  accounts          Account[]
 
-  sessions Session[]
+  @@index([email])
 }
 
 model RefreshToken {
   id        String   @id @default(uuid()) @map("id")
   token     String   @unique
-  userId    String   @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
-  expiresAt DateTime @map("expires_at")
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-}
-
-model Session {
-  id        String   @id @default(uuid()) @map("id")
-  sessionId String   @unique @map("session_id")
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
@@ -71,4 +89,15 @@ model Menu {
   deletedAt      DateTime?     @map("deleted_at")
   menuCategoryId String?       @map("menu_category_id")
   menuCategory   MenuCategory? @relation(fields: [menuCategoryId], references: [id])
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid()) @map("id")
+  identifier String
+  token      String   @unique
+  expires    DateTime @map("expires")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([identifier, token])
 }
