@@ -5,6 +5,7 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
   const isAuthenticated = !!token;
   const isDashboardPage = req.nextUrl.pathname.startsWith("/dashboard");
+  const isOverviewPage = req.nextUrl.pathname === "/dashboard/overview";
   const isAuthPage =
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/register");
@@ -14,6 +15,10 @@ export async function middleware(req: NextRequest) {
   }
 
   if (isAuthenticated && isAuthPage) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  if (isOverviewPage) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
