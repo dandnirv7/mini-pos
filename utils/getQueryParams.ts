@@ -12,6 +12,7 @@ export function getQueryParams(searchParams: URLSearchParams): FilterParams {
       (searchParamsCache.get("status") as "active" | "inactive" | undefined) ||
       undefined,
     role: searchParamsCache.get("role") || undefined,
+    categories: searchParamsCache.get("categories") || undefined,
     sortBy: (searchParamsCache.get("sortBy") as keyof User | undefined) || "id",
     sortOrder: (searchParamsCache.get("sortOrder") as "asc" | "desc") || "asc",
     search: searchParamsCache.get("q") || "",
