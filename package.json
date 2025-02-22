@@ -41,6 +41,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
     "dompurify": "^3.2.4",
+    "immer": "^10.1.1",
     "jsdom": "^26.0.0",
     "lucide-react": "^0.475.0",
     "next": "15.1.7",
@@ -53,7 +54,8 @@
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
