@@ -18,6 +18,7 @@ export async function GET(request: Request) {
       categories,
       sortBy,
       sortOrder = "asc",
+      status,
     } = getQueryParams(searchParams);
 
     if (
@@ -38,6 +39,7 @@ export async function GET(request: Request) {
       deletedAt: null,
       AND: [
         categories ? { menuCategory: { is: { name: categories } } } : {},
+        status ? { status: status } : {},
         search
           ? {
               OR: [
@@ -57,6 +59,7 @@ export async function GET(request: Request) {
       prisma.menu.count({ where: whereCondition }),
       prisma.menu.findMany({
         where: whereCondition,
+        select: menuSelect,
         skip: offset,
         take: limit,
         orderBy: sortBy ? { [sortBy]: sortOrder } : undefined,
