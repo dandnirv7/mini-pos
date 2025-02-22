@@ -10,8 +10,9 @@ export type User = {
 export type FilterParams = {
   page?: number;
   limit?: number;
-  status?: "active" | "inactive" | undefined;
+  status?: "active" | "inactive" | "available" | "out of stock" | undefined;
   role?: string;
+  categories?: string;
   sortBy?: keyof User;
   sortOrder?: "asc" | "desc";
   search?: string;

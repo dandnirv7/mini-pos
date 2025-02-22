@@ -29,8 +29,8 @@ export const sidebarData: SidebarData = {
           icon: IconLayoutDashboard,
         },
         {
-          title: "Products",
-          url: "/dashboard/products",
+          title: "Menus",
+          url: "/dashboard/menus",
           icon: IconChecklist,
         },
         {

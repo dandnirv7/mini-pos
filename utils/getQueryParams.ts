@@ -9,8 +9,12 @@ export function getQueryParams(searchParams: URLSearchParams): FilterParams {
 
   return {
     status:
-      (searchParamsCache.get("status") as "active" | "inactive" | undefined) ||
-      undefined,
+      (searchParamsCache.get("status") as
+        | "active"
+        | "inactive"
+        | "available"
+        | "out of stock"
+        | undefined) || undefined,
     role: searchParamsCache.get("role") || undefined,
     categories: searchParamsCache.get("categories") || undefined,
     sortBy: (searchParamsCache.get("sortBy") as keyof User | undefined) || "id",
