@@ -23,8 +23,17 @@ export async function handler(
 
     switch (request.method) {
       case "GET": {
-        const existingMenu = await prisma.menu.findUnique({
-          where: { id },
+        const existingMenu = await prisma.menu.findFirst({
+          where: {
+            OR: [
+              {
+                id: id,
+              },
+              {
+                slug: id,
+              },
+            ],
+          },
           select: menuSelect,
         });
 
