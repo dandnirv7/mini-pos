@@ -23,7 +23,7 @@ export const ERROR_MESSAGES = {
   PASSWORD_RESET_FAILED: "Failed to send password reset email.",
   SAME_PASSWORD: "New password cannot be the same as the previous password.",
 
-  // Products / Menu
-  MENU_NOT_FOUND: "Menu not found.",
-  MENU_EXISTS: "Menu already exists.",
+  // Product Errors
+  PRODUCT_NOT_FOUND: "Product not found.",
+  PRODUCT_EXISTS: "Product already exists.",
 } as const;

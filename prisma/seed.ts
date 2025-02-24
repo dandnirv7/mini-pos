@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
-import { Menu, MenuCategory, PrismaClient, User } from "@prisma/client";
+import { PrismaClient, Product, User } from "@prisma/client";
 import bcrypt from "bcrypt";
+
 const prisma = new PrismaClient();
 
 const hashPassword = async (password: string): Promise<string> => {
@@ -37,22 +38,7 @@ const users: Omit<User, "deletedAt" | "resetToken" | "resetTokenExpires">[] =
     };
   });
 
-const menuCategories: Omit<MenuCategory, "deletedAt">[] = [
-  {
-    id: faker.string.uuid(),
-    name: "food",
-    createdAt: faker.date.past(),
-    updatedAt: faker.date.recent(),
-  },
-  {
-    id: faker.string.uuid(),
-    name: "beverages",
-    createdAt: faker.date.past(),
-    updatedAt: faker.date.recent(),
-  },
-];
-
-const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
+const products: Omit<Product, "deletedAt" | "imageUrl">[] = [
   {
     id: faker.string.uuid(),
     name: "Espresso",
@@ -64,7 +50,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
+    category: "beverages",
   },
   {
     id: faker.string.uuid(),
@@ -77,20 +63,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
-  },
-  {
-    id: faker.string.uuid(),
-    name: "Latte",
-    slug: "latte",
-    price: 27900,
-    description:
-      "A Latte is a coffee drink made with espresso and steamed milk, topped with a small amount of foam. It's a smooth, creamy coffee drink that's perfect for those who love a mild coffee flavor with a touch of sweetness.",
-    stock: 100,
-    status: "available",
-    createdAt: faker.date.past(),
-    updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
+    category: "beverages",
   },
   {
     id: faker.string.uuid(),
@@ -103,7 +76,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "out of stock",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[0].id,
+    category: "food",
   },
   {
     id: faker.string.uuid(),
@@ -116,7 +89,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[0].id,
+    category: "food",
   },
   {
     id: faker.string.uuid(),
@@ -129,7 +102,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[0].id,
+    category: "beverages",
   },
   {
     id: faker.string.uuid(),
@@ -142,7 +115,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[0].id,
+    category: "food",
   },
   {
     id: faker.string.uuid(),
@@ -155,7 +128,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
+    category: "beverages",
   },
   {
     id: faker.string.uuid(),
@@ -168,7 +141,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
+    category: "beverages",
   },
   {
     id: faker.string.uuid(),
@@ -181,7 +154,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
+    category: "beverages",
   },
   {
     id: faker.string.uuid(),
@@ -194,7 +167,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
+    category: "beverages",
   },
   {
     id: faker.string.uuid(),
@@ -207,7 +180,7 @@ const menus: Omit<Menu, "deletedAt" | "imageUrl">[] = [
     status: "available",
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    menuCategoryId: menuCategories[1].id,
+    category: "beverages",
   },
 ];
 
@@ -223,18 +196,12 @@ async function main() {
     });
   }
 
-  for (const category of menuCategories) {
-    await prisma.menuCategory.create({
-      data: category,
-    });
-  }
-
-  for (const menu of menus) {
-    await prisma.menu.create({
+  for (const product of products) {
+    await prisma.product.create({
       data: {
-        ...menu,
-        menuCategoryId:
-          menuCategories[Math.floor(Math.random() * menuCategories.length)].id,
+        ...product,
+
+        category: product.category,
       },
     });
   }
