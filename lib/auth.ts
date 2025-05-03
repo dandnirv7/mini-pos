@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./db";
+import { v4 as uuidv4 } from "uuid";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -49,11 +50,23 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
+        const sessionToken = uuidv4();
+        const expires = new Date(Date.now() + 60 * 60 * 1000);
+
+        await prisma.session.create({
+          data: {
+            sessionToken,
+            userId: user.id,
+            expires,
+          },
+        });
+
         return {
           id: user.id,
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          sessionToken,
         };
       },
     }),
@@ -74,8 +87,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id,
-          username: token.username,
-          fullName: token.fullName,
+          sessionToken: token.sessionToken,
         },
       };
     },

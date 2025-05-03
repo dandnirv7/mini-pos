@@ -26,4 +26,8 @@ export const ERROR_MESSAGES = {
   // Product Errors
   PRODUCT_NOT_FOUND: "Product not found.",
   PRODUCT_EXISTS: "Product already exists.",
+  PRODUCT_CREATE_FAILED: "Error creating product.",
+
+  NETWORK_ERROR:
+    "There was a problem connecting to the network. Please check your internet connection and try again.",
 } as const;

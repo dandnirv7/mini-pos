@@ -14,9 +14,9 @@ export const sidebarData: SidebarData = {
   },
   teams: [
     {
-      name: "Shadcn Admin",
+      name: "Mini POS",
       logo: Command,
-      plan: "Vite + ShadcnUI",
+      plan: "Free",
     },
   ],
   navGroups: [
@@ -29,8 +29,8 @@ export const sidebarData: SidebarData = {
           icon: IconLayoutDashboard,
         },
         {
-          title: "Menus",
-          url: "/dashboard/menus",
+          title: "Product",
+          url: "/dashboard/product",
           icon: IconChecklist,
         },
         {

@@ -26,10 +26,11 @@ import {
   type ProductData,
   productSchema,
 } from "@/features/products/data/schema";
+import { ERROR_MESSAGES } from "@/utils/errorMessage";
 import { formatFileName } from "@/utils/formatFileName";
 import { formattedString } from "@/utils/formattedString";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 export default function ProductForm({
@@ -40,7 +41,7 @@ export default function ProductForm({
   pageTitle: string;
 }) {
   const pathname = usePathname();
-  console.log(pathname);
+  const router = useRouter();
 
   const defaultValues = {
     name: initialData?.name || "",
@@ -64,8 +65,13 @@ export default function ProductForm({
 
     try {
       await productActions.createProduct(updatedValues);
+      form.reset();
+
+      router.push("/dashboard/product");
     } catch (error) {
-      console.log(error);
+      if (error instanceof Error) {
+        throw new Error(ERROR_MESSAGES.PRODUCT_CREATE_FAILED);
+      }
     }
   }
 
@@ -193,7 +199,7 @@ export default function ProductForm({
               )}
             />
             <Button type="submit">
-              {pathname === "/dashboard/products/new"
+              {pathname === "/dashboard/product/new"
                 ? "Add Product"
                 : "Update Product"}
             </Button>

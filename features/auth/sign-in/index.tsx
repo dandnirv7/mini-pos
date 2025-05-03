@@ -6,9 +6,11 @@ import Link from "next/link";
 export default function SignIn() {
   return (
     <AuthLayout>
-      <Card className="p-6 space-y-3">
+      <Card className="p-6 space-y-3 bg-white dark:bg-black/50">
         <div className="flex flex-col space-y-2 text-left">
-          <h1 className="text-2xl font-semibold tracking-tight">Login</h1>
+          <h1 className="text-2xl text-foreground dark:text-background font-semibold tracking-tight">
+            Login
+          </h1>
           <p className="text-sm text-muted-foreground">
             Enter your email and password below <br />
             to log into your account

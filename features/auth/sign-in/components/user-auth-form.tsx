@@ -98,11 +98,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 </FormItem>
               )}
             />
-            <Button className="mt-2" disabled={isPending}>
+            <Button className="mt-2 bg-primary" disabled={isPending}>
               {isPending ? "Logging in..." : "Login"}
             </Button>
 
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-sm text-muted-foreground  text-center">
               Don&apos;t have an account?{" "}
               <span className="underline underline-offset-4 hover:text-primary">
                 <Link href="/register">Sign up</Link>
