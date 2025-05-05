@@ -10,9 +10,10 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { ProfileDropdown } from "@/components/profile-dropdown";
 import { Search } from "@/components/search";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import UsersProviders from "@/features/users/context/users-context";
-import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
+import UsersProviders from "@/features/users/context/users-context";
+import { SessionProvider } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 interface LayoutProps {
   readonly children: ReactNode;
@@ -22,7 +23,7 @@ export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
 
   return (
-    <>
+    <SessionProvider>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="mx-auto max-w-screen-2xl">
@@ -50,7 +51,7 @@ export default function Layout({ children }: LayoutProps) {
           </UsersProviders>
         </SidebarInset>
       </SidebarProvider>
-    </>
+    </SessionProvider>
   );
 }
 

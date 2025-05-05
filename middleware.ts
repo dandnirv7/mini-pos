@@ -10,6 +10,12 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/register");
 
+  const isAdmin = token?.role === "admin";
+
+  if (isDashboardPage && !isAdmin) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
   if (isDashboardPage && !isAuthenticated) {
     return NextResponse.redirect(new URL("/api/auth/signin", req.url));
   }
@@ -26,5 +32,14 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+
+    "/dashboard/:path*",
+    "/login",
+    "/register",
+  ],
 };

@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@radix-ui/react-navigation-menu": "^1.2.10",
     "@tanstack/eslint-plugin-query": "^5.66.1",
     "@types/bcrypt": "^5.0.2",
     "@types/jsdom": "^21.1.7",

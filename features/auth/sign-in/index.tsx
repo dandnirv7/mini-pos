@@ -8,7 +8,7 @@ export default function SignIn() {
     <AuthLayout>
       <Card className="p-6 space-y-3 bg-white dark:bg-black/50">
         <div className="flex flex-col space-y-2 text-left">
-          <h1 className="text-2xl text-foreground dark:text-background font-semibold tracking-tight">
+          <h1 className="text-2xl text-foreground dark:text-foreground font-semibold tracking-tight">
             Login
           </h1>
           <p className="text-sm text-muted-foreground">
