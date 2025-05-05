@@ -1,25 +1,4 @@
-// // import { authOptions } from "@/lib/auth";
-// // import { prisma } from "@/lib/prisma";
-// // import { getServerSession } from "next-auth";
-// // import Dashboard from "./components/dashboard";
-
-// // const Page = async () => {
-// //   const session = await getServerSession(authOptions);
-
-// //   if (!session) {
-// //     return <p>Please log in to access the dashboard.</p>;
-// //   }
-
-// //   const user = await prisma.user.findFirst({
-// //     where: {
-// //       email: session.user?.email ?? "",
-// //     },
-// //   });
-
-// //   return <Dashboard fullName={user?.fullName} />;
-// // };
-
-// // export default Page;
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,8 +11,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { RecentSales } from "./components/recent-sales";
+import { useSession } from "next-auth/react";
 
-const page = () => {
+const Page = () => {
+  const { data: session } = useSession();
+  console.log(session);
+
   return (
     <>
       {" "}
@@ -193,4 +176,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

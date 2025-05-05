@@ -53,6 +53,7 @@ export const authOptions: NextAuthOptions = {
         const sessionToken = uuidv4();
         const expires = new Date(Date.now() + 60 * 60 * 1000);
 
+        // Optional: simpan session ke database jika kamu tetap ingin menyimpannya
         await prisma.session.create({
           data: {
             sessionToken,
@@ -66,6 +67,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          role: user.role,
           sessionToken,
         };
       },
@@ -74,10 +76,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        return {
-          ...token,
-          id: user.id,
-        };
+        token.id = user.id;
+        token.email = user.email;
+        token.username = user.username;
+        token.fullName = user.fullName;
+        token.role = user.role;
+        token.sessionToken = user.sessionToken;
       }
       return token;
     },
@@ -87,6 +91,10 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id,
+          email: token.email,
+          username: token.username,
+          fullName: token.fullName,
+          role: token.role,
           sessionToken: token.sessionToken,
         },
       };
