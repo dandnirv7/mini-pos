@@ -69,6 +69,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
     },
+    fontFamily: {
+      silkscreen: ["Silkscreen", "sans-serif"],
+    },
   },
   plugins: [tailwindcssAnimate],
 } satisfies Config;

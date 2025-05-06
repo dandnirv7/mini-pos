@@ -9,11 +9,13 @@ export async function middleware(req: NextRequest) {
   const isAuthPage =
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/register");
+  const isHomePage = req.nextUrl.pathname === "/";
 
   const isAdmin = token?.role === "admin";
+  const isUser = token?.role === "user";
 
   if (isDashboardPage && !isAdmin) {
-    return NextResponse.redirect(new URL("/", req.url));
+    return NextResponse.redirect(new URL("/user", req.url));
   }
 
   if (isDashboardPage && !isAuthenticated) {
@@ -22,6 +24,16 @@ export async function middleware(req: NextRequest) {
 
   if (isAuthenticated && isAuthPage) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  if (isAuthenticated && isHomePage) {
+    if (isAdmin) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    if (isUser) {
+      return NextResponse.redirect(new URL("/user", req.url));
+    }
   }
 
   if (isOverviewPage) {
