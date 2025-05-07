@@ -22,14 +22,21 @@ export const UserAvatarDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative w-8 h-8 rounded-full">
+        <Button
+          variant="ghost"
+          className="relative w-8 h-8 rounded-full dark:focus-within:ring-[#F26E41]"
+        >
           <Avatar className="w-8 h-8">
             <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
             <AvatarFallback>{getInitials(displayedUser ?? "")}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-gray-50" align="end" forceMount>
+      <DropdownMenuContent
+        className="w-56 bg-gray-50 dark:bg-zinc-700 "
+        align="end"
+        forceMount
+      >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{displayedUser}</p>
@@ -39,19 +46,19 @@ export const UserAvatarDropdown = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer dark:hover:bg-[#F26E41] dark:hover:text-white">
           <Link href="/user/profile" className="flex items-center gap-2">
             <User className="w-4 h-4 mr-2" />
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer dark:hover:bg-[#F26E41] dark:hover:text-white">
           <Link href="/user/settings" className="flex items-center gap-2">
             <Settings className="w-4 h-4 mr-2" />
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer dark:hover:bg-[#F26E41] dark:hover:text-white">
           <Link href="/user/orders" className="flex items-center gap-2">
             <Coffee className="w-4 h-4 mr-2" />
             <span>My Orders</span>
@@ -59,7 +66,7 @@ export const UserAvatarDropdown = () => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="cursor-pointer"
+          className="cursor-pointer dark:hover:bg-[#F26E41] dark:hover:text-white"
           onClick={() => signOut({ callbackUrl: "/" })}
         >
           <LogOut className="w-4 h-4 mr-2" />

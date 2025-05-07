@@ -1,7 +1,7 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductCard } from "./product-card";
 
 type Category = {
@@ -34,7 +34,7 @@ export const MenuSection = ({
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">Explore Our Menu</h2>
-        <Button variant="link" className="text-sm">
+        <Button variant="link" className="text-sm dark:text-[#F26E41]">
           View All
         </Button>
       </div>
@@ -43,7 +43,7 @@ export const MenuSection = ({
         <CategoryTabs categories={categories} />
 
         {Object.entries(productsByCategory).map(([categoryId, products]) => (
-          <TabsContent key={categoryId} value={categoryId} className="mt-0">
+          <TabsContent key={categoryId} value={categoryId} className="mt-0 ">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
@@ -58,18 +58,18 @@ export const MenuSection = ({
 
 const CategoryTabs = ({ categories }: { categories: Category[] }) => {
   return (
-    <TabsList className="justify-start w-full h-auto gap-2 pb-1 mb-6 bg-transparent border-b">
+    <TabsList className="justify-start w-full h-auto gap-2 pb-2 mb-6 bg-transparent border-b">
       {categories.map((category) => (
         <TabsTrigger
           key={category.id}
           value={category.id}
-          className="rounded-full border data-[state=active]:bg-black data-[state=active]:text-white px-4 py-1.5 h-auto"
+          className="rounded-md border data-[state=active]:bg-[#F26E41] data-[state=active]:text-white px-4 py-1.5 h-auto dark:text-white dark:data-[state=active]:text-black"
         >
           {category.name}
         </TabsTrigger>
       ))}
       <div className="ml-auto">
-        <Button variant="outline" size="sm" className="rounded-full">
+        <Button variant="outline" size="sm" className="bg-transparent">
           <svg
             width="15"
             height="15"
