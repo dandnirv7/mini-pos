@@ -5,9 +5,18 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
   const isAuthenticated = !!token;
   const isDashboardPage = req.nextUrl.pathname.startsWith("/dashboard");
+  const isOverviewPage = req.nextUrl.pathname === "/dashboard/overview";
   const isAuthPage =
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/register");
+  const isHomePage = req.nextUrl.pathname === "/";
+
+  const isAdmin = token?.role === "admin";
+  const isUser = token?.role === "user";
+
+  if (isDashboardPage && !isAdmin) {
+    return NextResponse.redirect(new URL("/user", req.url));
+  }
 
   if (isDashboardPage && !isAuthenticated) {
     return NextResponse.redirect(new URL("/api/auth/signin", req.url));
@@ -17,9 +26,32 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
+  if (isAuthenticated && isHomePage) {
+    if (isAdmin) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    if (isUser) {
+      return NextResponse.redirect(new URL("/user", req.url));
+    }
+  }
+
+  if (isOverviewPage) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+
+    "/dashboard/:path*",
+    "/login",
+    "/register",
+  ],
 };
