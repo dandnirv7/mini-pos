@@ -1,40 +1,122 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProductCard } from "./product-card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import Image from "next/image";
+import { useMemo, useState } from "react";
+import { CartItemData, Product } from "@/features/accounts/types/product";
+import { CategoryTabs } from "./category-tabs";
+
+import { Card, CardContent } from "@/components/ui/card";
+import placeholder from "@/public/placeholder.png";
+import toRupiahs from "@/utils/formatCurrency";
+import { Minus, Plus } from "lucide-react";
+import { useCartActions } from "@/features/accounts/hooks/useCartActions";
 
 type Category = {
   id: string;
   name: string;
 };
 
-type Product = {
-  id: string | number;
-  name: string;
-  price: number;
-  image?: string;
-  rating?: number;
-  inCart?: boolean;
-  quantity?: number;
-};
-
 type MenuSectionProps = {
+  cartItems: CartItemData[];
+  userId: string;
+  onCartUpdate: () => void;
   categories: Category[];
   productsByCategory: Record<string, Product[]>;
   defaultCategory?: string;
 };
 
 export const MenuSection = ({
+  cartItems,
+  userId,
+  onCartUpdate,
   categories,
   productsByCategory,
   defaultCategory = "coffee",
 }: MenuSectionProps) => {
+  const [isViewAll, setIsViewAll] = useState(false);
+
+  const { handleAddToCart, updateCartItemQuantity } = useCartActions(
+    userId,
+    onCartUpdate
+  );
+
+  const mergeProductWithCart = (
+    items: Product[],
+    cartItems: CartItemData[]
+  ): (Product & { inCart: boolean; quantity: number })[] =>
+    items.map((item) => {
+      const cartMatch = cartItems.find(
+        (cartItem) => cartItem.product.id === item.id
+      );
+      return {
+        ...item,
+        inCart: !!cartMatch,
+        quantity: cartMatch?.quantity || 0,
+      };
+    });
+
+  const mergedProductsByCategory = useMemo(() => {
+    const merged: Record<
+      string,
+      (Product & { inCart: boolean; quantity: number })[]
+    > = {};
+
+    for (const [category, products] of Object.entries(productsByCategory)) {
+      merged[category] = mergeProductWithCart(products, cartItems);
+    }
+
+    return merged;
+  }, [productsByCategory, cartItems]);
+
+  const renderCartControls = (
+    item: Product & { inCart: boolean; quantity: number }
+  ) => {
+    if (!item.inCart) {
+      return (
+        <Button
+          size="sm"
+          className="h-8 text-xs text-white bg-[#F26E41] rounded-md hover:bg-[#E05A2E]"
+          onClick={() => handleAddToCart(item.id)}
+        >
+          Add to Cart
+        </Button>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <Button
+          size="icon"
+          variant="outline"
+          className="rounded-full h-7 w-7 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:border-zinc-800"
+          onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}
+        >
+          <Minus className="w-3 h-3" />
+        </Button>
+        <span className="text-sm">{item.quantity}</span>
+        <Button
+          size="icon"
+          variant="outline"
+          className="text-white rounded-full h-7 w-7 bg-[#F26E41] hover:bg-[#E05A2E]"
+          onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}
+        >
+          <Plus className="w-3 h-3 text-white" />
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">Explore Our Menu</h2>
-        <Button variant="link" className="text-sm dark:text-[#F26E41]">
+        <Button
+          variant="link"
+          className="text-sm dark:text-[#F26E41]"
+          onClick={() => setIsViewAll(true)}
+        >
           View All
         </Button>
       </div>
@@ -42,52 +124,50 @@ export const MenuSection = ({
       <Tabs defaultValue={defaultCategory} className="w-full">
         <CategoryTabs categories={categories} />
 
-        {Object.entries(productsByCategory).map(([categoryId, products]) => (
-          <TabsContent key={categoryId} value={categoryId} className="mt-0 ">
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </TabsContent>
-        ))}
+        {Object.entries(mergedProductsByCategory).map(
+          ([categoryId, products]) => {
+            const visibleProducts =
+              categoryId === "all" && !isViewAll
+                ? products.slice(0, 12)
+                : products;
+
+            return (
+              <TabsContent key={categoryId} value={categoryId} className="mt-0">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  {visibleProducts.map((product) => (
+                    <Card
+                      key={product.id}
+                      className="overflow-hidden border dark:bg-zinc-800"
+                    >
+                      <div className="relative">
+                        <Image
+                          src={product.imageUrl || placeholder}
+                          alt={product.name}
+                          width={200}
+                          height={200}
+                          className="object-cover w-full h-40 bg-zinc-100"
+                        />
+                      </div>
+                      <CardContent className="px-3 py-4 dark:bg-zinc-800">
+                        <h3 className="mb-1 font-medium">{product.name}</h3>
+                        <p className="mb-2 text-sm text-gray-500 line-clamp-2 dark:text-muted-foreground">
+                          {product.description}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold ">
+                            {toRupiahs(product.price)}
+                          </span>
+                          {renderCartControls(product)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+            );
+          }
+        )}
       </Tabs>
     </div>
-  );
-};
-
-const CategoryTabs = ({ categories }: { categories: Category[] }) => {
-  return (
-    <TabsList className="justify-start w-full h-auto gap-2 pb-2 mb-6 bg-transparent border-b">
-      {categories.map((category) => (
-        <TabsTrigger
-          key={category.id}
-          value={category.id}
-          className="rounded-md border data-[state=active]:bg-[#F26E41] data-[state=active]:text-white px-4 py-1.5 h-auto dark:text-white dark:data-[state=active]:text-black"
-        >
-          {category.name}
-        </TabsTrigger>
-      ))}
-      <div className="ml-auto">
-        <Button variant="outline" size="sm" className="bg-transparent">
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 15 15"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4 mr-2"
-          >
-            <path
-              d="M4 5.5C4 5.22386 4.22386 5 4.5 5H10.5C10.7761 5 11 5.22386 11 5.5C11 5.77614 10.7761 6 10.5 6H4.5C4.22386 6 4 5.77614 4 5.5ZM5.5 8C5.22386 8 5 8.22386 5 8.5C5 8.77614 5.22386 9 5.5 9H9.5C9.77614 9 10 8.77614 10 8.5C10 8.22386 9.77614 8 9.5 8H5.5Z"
-              fill="currentColor"
-              fillRule="evenodd"
-              clipRule="evenodd"
-            ></path>
-          </svg>
-          Filter
-        </Button>
-      </div>
-    </TabsList>
   );
 };

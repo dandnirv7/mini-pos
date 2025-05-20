@@ -6,7 +6,7 @@ import Link from "next/link";
 import { UserAvatarDropdown } from "./avatar-dropdown";
 import { UserSearch } from "./search";
 
-export const UserHeader = () => {
+export const UserHeader = ({ cartQuantity }: { cartQuantity: number }) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-6">
@@ -25,7 +25,7 @@ export const UserHeader = () => {
         >
           <ShoppingCart className="text-[#F26E41] size-6" />
           <span className="absolute flex items-center justify-center w-5 h-5 text-xs text-white bg-orange-500 rounded-full -top-2 -right-2">
-            3
+            {cartQuantity > 99 ? "99+" : cartQuantity}
           </span>
         </Button>
         <UserAvatarDropdown />

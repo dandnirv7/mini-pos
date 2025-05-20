@@ -33,7 +33,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {/* Profile Sidebar */}
           <div className="md:col-span-1">
-            <Card>
+            <Card className="bg-white shadow-md dark:bg-zinc-700">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center mb-6 text-center">
                   <Avatar className="w-24 h-24 mb-4">
@@ -41,7 +41,9 @@ export default function ProfilePage() {
                       src="/placeholder.svg?height=96&width=96"
                       alt="User"
                     />
-                    <AvatarFallback className="text-2xl">JD</AvatarFallback>
+                    <AvatarFallback className="text-2xl bg-zinc-200">
+                      JD
+                    </AvatarFallback>
                   </Avatar>
                   <h2 className="text-xl font-bold">John Doe</h2>
                   <p className="text-muted-foreground">john.doe@example.com</p>

@@ -53,7 +53,6 @@ export const authOptions: NextAuthOptions = {
         const sessionToken = uuidv4();
         const expires = new Date(Date.now() + 60 * 60 * 1000);
 
-        // Optional: simpan session ke database jika kamu tetap ingin menyimpannya
         await prisma.session.create({
           data: {
             sessionToken,

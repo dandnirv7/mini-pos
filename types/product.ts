@@ -6,5 +6,9 @@ export type Product = {
   category: string;
   price: number;
   stock: number;
-  status: "available" | "out of stock" | null | string;
+  status: "available" | "out of stock" | string | null;
+  imageUrl?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
 };
