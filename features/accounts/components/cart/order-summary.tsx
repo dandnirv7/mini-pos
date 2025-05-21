@@ -171,7 +171,7 @@ export const OrderSummary = ({
             </div>
 
             <Button className="w-full text-white bg-orange-500 hover:bg-orange-600">
-              Checkout
+              <Link href={"/user/checkout/payment"}>Checkout</Link>
             </Button>
           </div>
         </Card>
