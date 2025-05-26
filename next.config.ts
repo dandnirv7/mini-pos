@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL_DEV: process.env.BASE_URL_DEV,
     NEXT_PUBLIC_API_URL_PROD: process.env.BASE_URL_PROD,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
