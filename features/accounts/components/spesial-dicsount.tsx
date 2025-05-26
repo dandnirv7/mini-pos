@@ -13,13 +13,11 @@ import { useCartActions } from "@/features/accounts/hooks/useCartActions";
 
 export const SpecialDiscountSection = ({
   userId,
-  onCartUpdate,
   items,
   cartItems,
   title = "Special Discount Today",
 }: {
   userId: string;
-  onCartUpdate: () => void;
   items: DiscountItem[];
   cartItems: CartItemData[];
   title?: string;
@@ -27,12 +25,9 @@ export const SpecialDiscountSection = ({
   const {
     items: discountedItems,
     timer: { hours, minutes, seconds },
-  } = useSpecialDiscount( items, cartItems);
+  } = useSpecialDiscount(items, cartItems);
 
-  const { handleAddToCart, updateCartItemQuantity } = useCartActions(
-    userId,
-    onCartUpdate
-  );
+  const { handleAddToCart, updateCartItemQuantity } = useCartActions(userId);
 
   const renderCartControls = (item: DiscountItem) => {
     if (!item.inCart) {
@@ -54,7 +49,7 @@ export const SpecialDiscountSection = ({
           variant="outline"
           className="rounded-full h-7 w-7 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:border-zinc-800"
           onClick={() =>
-            updateCartItemQuantity(item.product.id, item.quantity - 1)
+            updateCartItemQuantity(item.product.id, item.quantity! - 1)
           }
         >
           <Minus className="w-3 h-3" />
@@ -65,7 +60,7 @@ export const SpecialDiscountSection = ({
           variant="outline"
           className="text-white rounded-full h-7 w-7 bg-[#F26E41] hover:bg-[#E05A2E]"
           onClick={() =>
-            updateCartItemQuantity(item.product.id, item.quantity + 1)
+            updateCartItemQuantity(item.product.id, item.quantity! + 1)
           }
         >
           <Plus className="w-3 h-3 text-white" />

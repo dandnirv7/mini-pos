@@ -1,54 +1,20 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { useMemo } from "react";
-
-type Product = {
-  id: string;
-  name: string;
-  slug: string;
-  category: string;
-  price: number;
-  description: string;
-  imageUrl: string | null;
-  status: "available" | "unavailable";
-  stock: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-};
+import {
+  ApiResponse,
+  DiscountParams,
+  Product,
+} from "@/features/accounts/types/product";
 
 type DiscountProduct = {
   id: string;
+  productId: string;
   discount: number;
-  date: string;
+  startDate: string | Date;
+  endDate: string;
   createdAt: string;
-  quantity: number;
-  inCart: boolean;
   product: Product;
-};
-
-type ApiResponse<T> = {
-  data: T;
-  status: string;
-};
-
-type DiscountParams = {
-  page?: number;
-  limit?: number;
-  order?: "asc" | "desc";
-  today?: string;
-};
-
-const fetchSpecialDiscountProducts = async (
-  params?: DiscountParams
-): Promise<DiscountProduct[]> => {
-  const response = await axiosInstance.get<ApiResponse<DiscountProduct[]>>(
-    "/api/daily-discount",
-    {
-      params,
-    }
-  );
-  return response.data.data;
 };
 
 export function useSpecialDiscountProducts(params?: DiscountParams) {
@@ -59,7 +25,22 @@ export function useSpecialDiscountProducts(params?: DiscountParams) {
     queryFn: () => fetchSpecialDiscountProducts(stableParams),
     staleTime: 1000 * 60 * 5,
     placeholderData: keepPreviousData,
-    enabled: !!params?.today,
     refetchOnWindowFocus: false,
   });
 }
+
+const fetchSpecialDiscountProducts = async (
+  params?: DiscountParams
+): Promise<DiscountProduct[]> => {
+  try {
+    console.log("[FetchDiscount] Request params:", params);
+    const response = await axiosInstance.get<ApiResponse<DiscountProduct[]>>(
+      "/api/daily-discount",
+      { params: { ...params, today: params?.today ? "true" : undefined } }
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error("[FetchDiscount] Error:", error);
+    throw error;
+  }
+};

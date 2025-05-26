@@ -2,7 +2,10 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
-  category: string;
+  categoryId: string;
+  category: {
+    name: string;
+  };
   price: number;
   description: string;
   imageUrl?: string | null | undefined;
@@ -42,9 +45,22 @@ export type CartItemData = {
 export type DiscountItem = {
   id: string;
   discount: number;
-  date: string;
+  startDate: string | Date;
+  endDate: string;
   createdAt: string;
-  quantity: number;
-  inCart: boolean;
+  quantity?: number;
+  inCart?: boolean;
   product: Product;
+};
+
+export type DiscountParams = {
+  page?: number;
+  limit?: number;
+  order?: "asc" | "desc";
+  today?: string;
+};
+
+export type ApiResponse<T> = {
+  data: T;
+  status: string;
 };

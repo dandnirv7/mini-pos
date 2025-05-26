@@ -5,10 +5,16 @@ declare module "next-auth" {
     user: {
       id: string;
       email: string;
-      username: string;
-      fullName: string;
-      role: string;
-      sessionToken: string;
+      username?: string;
+      fullName?: string;
+      role?: string;
+      sessionToken?: string;
     } & DefaultSession["user"];
+  }
+  interface User extends NextAuthUser {
+    username?: string;
+    fullName?: string;
+    role?: string;
+    sessionToken?: string;
   }
 }

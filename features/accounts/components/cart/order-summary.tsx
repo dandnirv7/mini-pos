@@ -14,7 +14,6 @@ import placeholder from "@/public/placeholder.png";
 
 type OrderSummaryProps = {
   userId: string;
-  onCartUpdate: () => void;
   cartItems: CartItemData[];
   specialItems: DiscountItem[];
   deliveryFee?: number;
@@ -22,17 +21,14 @@ type OrderSummaryProps = {
 
 export const OrderSummary = ({
   userId,
-  onCartUpdate,
   cartItems,
   specialItems,
   deliveryFee = 15000,
 }: OrderSummaryProps) => {
   const { data: session } = useSession();
   const displayedUser = session?.user?.fullName || "Guest";
-  const { updateCartItemQuantity, handleCartDelete } = useCartActions(
-    userId,
-    onCartUpdate
-  );
+  const { updateCartItemQuantity, removeFromCart: handleCartDelete } =
+    useCartActions(userId);
 
   const getDiscountedPrice = (productId: string, price: number): number => {
     const special = specialItems.find((item) => item.product.id === productId);
@@ -170,9 +166,11 @@ export const OrderSummary = ({
               </div>
             </div>
 
-            <Button className="w-full text-white bg-orange-500 hover:bg-orange-600">
-              <Link href={"/user/checkout/payment"}>Checkout</Link>
-            </Button>
+            <Link href={"/user/checkout/payment"}>
+              <Button className="w-full text-white mt-4 bg-orange-500 hover:bg-orange-600">
+                Checkout
+              </Button>
+            </Link>
           </div>
         </Card>
       )}

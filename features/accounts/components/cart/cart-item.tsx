@@ -9,12 +9,11 @@ import { useCartActions } from "@/features/accounts/hooks/useCartActions";
 
 type CartItemProps = {
   userId: string;
-  onCartUpdate: () => void;
   item: CartItemData;
 };
 
-export const CartItem = ({ userId, onCartUpdate, item }: CartItemProps) => {
-  const { updateCartItemQuantity } = useCartActions(userId, onCartUpdate);
+export const CartItem = ({ userId, item }: CartItemProps) => {
+  const { updateCartItemQuantity } = useCartActions(userId);
 
   return (
     <div className="flex items-center justify-between">

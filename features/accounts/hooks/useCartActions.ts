@@ -1,61 +1,113 @@
 import { axiosInstance } from "@/utils/axiosInstance";
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const useCartActions = (userId: string, onCartUpdate?: () => void) => {
+export const useCartActions = (userId: string) => {
+  const queryClient = useQueryClient();
+
   const handleAddToCart = useCallback(
-    async (productId: string) => {
+    async (productId: string, quantity: number = 1) => {
       try {
-        await axiosInstance.post(`/api/users/${userId}/cart`, {
+        if (!userId) throw new Error("User ID is required");
+        if (!productId) throw new Error("Product ID is required");
+
+        const response = await axiosInstance.post(`/api/users/${userId}/cart`, {
           productId,
-          quantity: 1,
+          quantity,
         });
-        onCartUpdate?.();
+
+        queryClient.invalidateQueries({ queryKey: ["user-cart", userId] });
+
+        return {
+          success: true,
+          data: response.data,
+        };
       } catch (error) {
-        console.error("Add to cart failed", error);
+        console.error("Add to cart failed:", error);
+        return {
+          success: false,
+          error:
+            error instanceof Error ? error.message : "Failed to add to cart",
+        };
       }
     },
-    [userId, onCartUpdate]
+    [userId, queryClient]
   );
 
   const updateCartItemQuantity = useCallback(
     async (productId: string, quantity: number) => {
       try {
-        if (quantity < 1) {
-          await axiosInstance.delete(`/api/users/${userId}/cart`, {
+        if (!userId) throw new Error("User ID is required");
+        if (!productId) throw new Error("Product ID is required");
+        if (quantity < 0) throw new Error("Quantity cannot be negative");
+
+        let response;
+
+        if (quantity === 0) {
+          response = await axiosInstance.delete(`/api/users/${userId}/cart`, {
             data: { productId },
           });
         } else {
-          await axiosInstance.patch(`/api/users/${userId}/cart`, {
+          response = await axiosInstance.patch(`/api/users/${userId}/cart`, {
             productId,
             quantity,
           });
         }
-        onCartUpdate?.();
+
+        queryClient.invalidateQueries({ queryKey: ["user-cart", userId] });
+
+        return {
+          success: true,
+          data: response.data,
+        };
       } catch (error) {
-        console.error("Update cart failed", error);
+        console.error("Update cart failed:", error);
+        return {
+          success: false,
+          error:
+            error instanceof Error ? error.message : "Failed to update cart",
+        };
       }
     },
-    [userId, onCartUpdate]
+    [userId, queryClient]
   );
 
-  const handleCartDelete = useCallback(
+  const removeFromCart = useCallback(
     async (productId: string) => {
       try {
-        await axiosInstance.delete(`/api/users/${userId}/cart`, {
-          data: { productId },
-        });
+        if (!userId) throw new Error("User ID is required");
+        if (!productId) throw new Error("Product ID is required");
 
-        onCartUpdate?.();
+        const response = await axiosInstance.delete(
+          `/api/users/${userId}/cart`,
+          {
+            data: { productId },
+          }
+        );
+
+        queryClient.invalidateQueries({ queryKey: ["user-cart", userId] });
+
+        return {
+          success: true,
+          data: response.data,
+        };
       } catch (error) {
-        console.error("Delete cart failed", error);
+        console.error("Remove from cart failed:", error);
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to remove from cart",
+        };
       }
     },
-    [userId, onCartUpdate]
+    [userId, queryClient]
   );
 
   return {
     handleAddToCart,
     updateCartItemQuantity,
-    handleCartDelete,
+    removeFromCart,
   };
 };

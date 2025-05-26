@@ -21,7 +21,6 @@ type Category = {
 type MenuSectionProps = {
   cartItems: CartItemData[];
   userId: string;
-  onCartUpdate: () => void;
   categories: Category[];
   productsByCategory: Record<string, Product[]>;
   defaultCategory?: string;
@@ -30,17 +29,13 @@ type MenuSectionProps = {
 export const MenuSection = ({
   cartItems,
   userId,
-  onCartUpdate,
   categories,
   productsByCategory,
   defaultCategory = "coffee",
 }: MenuSectionProps) => {
   const [isViewAll, setIsViewAll] = useState(false);
 
-  const { handleAddToCart, updateCartItemQuantity } = useCartActions(
-    userId,
-    onCartUpdate
-  );
+  const { handleAddToCart, updateCartItemQuantity } = useCartActions(userId);
 
   const mergeProductWithCart = (
     items: Product[],
