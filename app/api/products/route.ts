@@ -4,7 +4,7 @@ import { handleError, handleValidationError } from "@/utils/errorHandler";
 import { ERROR_MESSAGES } from "@/utils/errorMessage";
 import { getQueryParams } from "@/utils/getQueryParams";
 import sanitizeData from "@/utils/sanitize";
-import { Prisma } from "@prisma/client";
+import { Prisma, ProductStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -38,8 +38,8 @@ export async function GET(request: Request) {
     const whereCondition: Prisma.ProductWhereInput = {
       deletedAt: null,
       AND: [
-        categories ? { category: categories } : {},
-        status ? { status: status } : {},
+        categories ? { categoryId: categories } : {},
+        status ? { status: status as ProductStatus } : {},
         search
           ? {
               OR: [
@@ -62,6 +62,13 @@ export async function GET(request: Request) {
         skip: offset,
         take: limit,
         orderBy: sortBy ? { [sortBy]: sortOrder } : undefined,
+        include: {
+          category: {
+            select: {
+              name: true,
+            },
+          },
+        },
       }),
     ]);
 

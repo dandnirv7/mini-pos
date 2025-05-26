@@ -3,145 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id                String    @id @default(uuid()) @map("id")
-  email             String    @unique
-  username          String    @unique
-  fullName          String
-  password          String    @map("password")
-  phoneNumber       String?   @unique
-  status            String?   @default("active") @map("status")
-  role              String    @default("user")
-  resetToken        String?
-  resetTokenExpires DateTime?
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @default(now()) @map("updated_at")
-  deletedAt         DateTime? @map("deleted_at")
-
-  refreshTokens RefreshToken[]
-  sessions      Session[]
-  addresses     Address[]
-  cart          Cart?
-  orders        Order[]
-
-  @@index([email])
-}
-
-model Address {
-  id          String   @id @default(uuid())
-  street      String
-  city        String
-  state       String
-  postalCode  String
-  phoneNumber String?  @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-}
-
-model Session {
-  id           String   @id @default(uuid()) @map("id")
-  sessionToken String   @unique @map("session_token")
-  userId       String   @map("user_id")
-  expires      DateTime @map("expires")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid()) @map("id")
-  token     String   @unique
-  userId    String   @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
-  expiresAt DateTime @map("expires_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-}
-
-model Product {
-  id          String    @id @default(uuid()) @map("id")
-  name        String
-  slug        String    @unique
-  category    String?   @map("category")
-  price       Float
-  description String
-  imageUrl    String?   @map("image_url")
-  status      String?   @default("available") @map("status")
-  stock       Int       @default(10)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @default(now()) @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
-
-  cartItems      CartItem[]
-  orderItems     OrderItem[]
-  dailyDiscounts DailyDiscount[]
-}
-
-model Cart {
-  id        String   @id @default(uuid())
-  userId    String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user  User       @relation(fields: [userId], references: [id])
-  items CartItem[]
-}
-
-model CartItem {
-  id        String @id @default(uuid())
-  cartId    String
-  productId String
-  quantity  Int    @default(1)
-
-  cart    Cart    @relation(fields: [cartId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
-}
-
-model Order {
-  id          String      @id @default(uuid())
-  userId      String
-  totalAmount Float
-  discount    Float       @default(0)
-  deliveryFee Float       @default(0)
-  status      OrderStatus @default(PENDING)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  user  User        @relation(fields: [userId], references: [id])
-  items OrderItem[]
-}
-
-model OrderItem {
-  id        String @id @default(uuid())
-  orderId   String
-  productId String
-  quantity  Int
-  price     Float
-
-  order   Order   @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
-}
-
-model DailyDiscount {
-  id        String   @id @default(uuid())
-  productId String
-  discount  Float
-  date      DateTime
-  createdAt DateTime @default(now())
-
-  product Product @relation(fields: [productId], references: [id])
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum OrderStatus {
@@ -150,4 +14,239 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+  RETURNED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ProductStatus {
+  AVAILABLE
+  OUT_OF_STOCK
+  DISCONTINUED
+}
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  username          String     @unique
+  fullName          String
+  password          String
+  phoneNumber       String?    @unique
+  status            UserStatus @default(ACTIVE)
+  role              String     @default("USER")
+  resetToken        String?
+  resetTokenExpires DateTime?
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  deletedAt         DateTime?  @map("deleted_at")
+
+  refreshTokens RefreshToken[]
+  sessions      Session[]
+  addresses     Address[]
+  cart          Cart?
+  orders        Order[]
+
+  @@index([email])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  street      String
+  city        String
+  state       String
+  postalCode  String   @map("postal_code")
+  phoneNumber String?  @map("phone_number")
+  isPrimary   Boolean  @default(false) @map("is_primary")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  userId      String   @map("user_id")
+
+  user   User    @relation(fields: [userId], references: [id])
+  orders Order[]
+
+  @@map("addresses")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  expiresAt DateTime @map("expires_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  imageUrl    String?   @map("image_url")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  products Product[]
+
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+model Product {
+  id          String        @id @default(uuid())
+  name        String
+  slug        String        @unique
+  categoryId  String        @map("category_id")
+  price       Float
+  description String
+  imageUrl    String?       @map("image_url")
+  status      ProductStatus @default(AVAILABLE)
+  stock       Int           @default(10)
+  weight      Float?        @default(0.5)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  deletedAt   DateTime?     @map("deleted_at")
+
+  category       Category       @relation(fields: [categoryId], references: [id])
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  dailyDiscounts DailyDiscount[]
+
+  @@index([deletedAt])
+  @@map("products")
+}
+
+model Cart {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String @id @default(uuid())
+  cartId    String @map("cart_id")
+  productId String @map("product_id")
+  quantity  Int    @default(1)
+
+  cart    Cart    @relation(fields: [cartId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  addressId      String        @map("address_id")
+  totalAmount    Float         @map("total_amount")
+  discount       Float         @default(0)
+  deliveryFee    Float         @default(0) @map("delivery_fee")
+  status         OrderStatus   @default(PENDING)
+  paymentStatus  PaymentStatus @default(PENDING) @map("payment_status")
+  shippingMethod String?       @map("shipping_method")
+  trackingNumber String?       @map("tracking_number")
+  customerNotes  String?       @map("customer_notes")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  user    User        @relation(fields: [userId], references: [id])
+  address Address     @relation(fields: [addressId], references: [id])
+  items   OrderItem[]
+  payment Payment?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String @map("order_id")
+  productId String @map("product_id")
+  quantity  Int
+  price     Float
+  discount  Float  @default(0)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+  @@map("order_items")
+}
+
+model Payment {
+  id                String    @id @default(uuid())
+  orderId           String    @unique @map("order_id")
+  paymentMethod     String    @map("payment_method")
+  paymentType       String?   @map("payment_type")
+  transactionId     String    @unique @map("transaction_id")
+  transactionTime   DateTime  @map("transaction_time")
+  transactionStatus String    @map("transaction_status")
+  grossAmount       Float     @map("gross_amount")
+  fraudStatus       String?   @map("fraud_status")
+  currency          String    @default("IDR")
+  vaNumber          String?   @map("va_number")
+  bank              String?
+  cardType          String?   @map("card_type")
+  maskedCard        String?   @map("masked_card")
+  approvalCode      String?   @map("approval_code")
+  settlementTime    DateTime? @map("settlement_time")
+  metadata          Json?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model DailyDiscount {
+  id        String   @id @default(uuid())
+  productId String   @map("product_id")
+  discount  Float
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("daily_discounts")
 }

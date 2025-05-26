@@ -14,8 +14,13 @@ type WhereCondition = {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const query = Object.fromEntries(searchParams.entries());
-    const parsed = discountValidatorSchema.parse(query);
+
+    const queryParams: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+      queryParams[key] = value;
+    });
+
+    const parsed = discountValidatorSchema.parse(queryParams);
     const { page, limit, sortBy, order, productId, today } = parsed;
 
     const skip = (page - 1) * limit;
@@ -55,15 +60,27 @@ export async function GET(req: NextRequest) {
         totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[DAILY_DISCOUNT_GET_ERROR]", error);
+
+    let errorMessage = "Unknown error occurred";
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      if (error.message.includes("query")) {
+        statusCode = 400;
+        errorMessage = "Invalid query parameters";
+      }
+    }
+
     return NextResponse.json(
       {
         success: false,
         message: "Failed to fetch daily discounts",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: errorMessage,
       },
-      { status: 500 }
+      { status: statusCode }
     );
   }
 }

@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id || typeof id !== "string") {
       return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
@@ -52,39 +52,27 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id: userId } = params;
+    const body = await request.json();
+    const { productId, quantity = 1 } = body;
 
-    if (!id) {
-      return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
+    if (!userId || !productId) {
+      return NextResponse.json(
+        { error: "User ID and Product ID are required" },
+        { status: 400 }
+      );
     }
 
-    const cart = await prisma.cart.findUnique({
-      where: { userId: id },
-      include: {
-        items: {
-          include: { product: true },
-        },
-      },
+    let cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: { items: true },
     });
 
     if (!cart) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Cart not found",
-        },
-        { status: 404 }
-      );
-    }
-
-    const body = await request.json();
-    const { productId, quantity } = body;
-
-    if (!productId || !quantity) {
-      return NextResponse.json(
-        { error: "Product ID and quantity are required" },
-        { status: 400 }
-      );
+      cart = await prisma.cart.create({
+        data: { userId },
+        include: { items: true },
+      });
     }
 
     const existingItem = cart.items.find(
@@ -94,39 +82,33 @@ export async function POST(
     if (existingItem) {
       const updatedItem = await prisma.cartItem.update({
         where: { id: existingItem.id },
+        data: { quantity: existingItem.quantity + quantity },
+      });
+
+      return NextResponse.json(
+        { success: true, data: updatedItem },
+        { status: 200 }
+      );
+    } else {
+      const newItem = await prisma.cartItem.create({
         data: {
-          quantity: existingItem.quantity + quantity,
+          cartId: cart.id,
+          productId,
+          quantity,
         },
       });
 
       return NextResponse.json(
-        {
-          success: true,
-          data: updatedItem,
-          message: "Cart item updated successfully",
-        },
-        { status: 200 }
+        { success: true, data: newItem },
+        { status: 201 }
       );
     }
-
-    const newItem = await prisma.cartItem.create({
-      data: {
-        cartId: cart.id,
-        productId,
-        quantity,
-      },
-    });
-
-    return NextResponse.json(
-      {
-        success: true,
-        data: newItem,
-        message: "Cart item added successfully",
-      },
-      { status: 201 }
-    );
   } catch (error) {
-    return handleError(error, ERROR_MESSAGES.PROCESS_FAILED);
+    console.error("[CART_POST_ERROR]", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 

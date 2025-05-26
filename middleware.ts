@@ -14,8 +14,8 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/login") || pathname.startsWith("/register");
   const isHomePage = pathname === "/";
 
-  const isAdmin = token?.role === "admin";
-  const isUser = token?.role === "user";
+  const isAdmin = token?.role === "ADMIN";
+  const isUser = token?.role === "USER";
 
   if (isDashboardPage) {
     if (!isAuthenticated) {
@@ -26,8 +26,13 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  if (isUserPage && !isUser) {
-    return NextResponse.redirect(new URL("/", req.url));
+  if (isUserPage) {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL("/api/auth/signin", req.url));
+    }
+    if (!isUser) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
   }
 
   if (isCheckoutPage && isUser) {
