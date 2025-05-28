@@ -146,7 +146,7 @@ export async function POST(request: Request) {
       data: {
         ...validatedData,
         role: validatedData.role || "user",
-        status: "active",
+        status: "ACTIVE",
       },
       select: {
         id: true,

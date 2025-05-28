@@ -1,12 +1,11 @@
 import { z } from "zod";
 
-const userStatusSchema = z.union([z.literal("active"), z.literal("inactive")]);
-
-const userRoleSchema = z.union([
-  z.literal("superadmin"),
-  z.literal("admin"),
-  z.literal("cashier"),
-  z.literal("user"),
+export const userStatusSchema = z.enum(["ACTIVE", "INACTIVE"]);
+export const userRoleSchema = z.enum([
+  "SUPERADMIN",
+  "ADMIN",
+  "CASHIER",
+  "USER",
 ]);
 
 const regexLowercase = /[a-z]/;
@@ -15,27 +14,23 @@ const regexDigit = /\d/;
 const regexSpecialChar = /[@$!%*?&]/;
 
 export const UserSchema = z.object({
-  email: z.string().email({ message: "Invalid email format" }),
-  username: z
-    .string()
-    .min(2, { message: "Username must be at least 2 characters" }),
-  fullName: z
-    .string()
-    .min(2, { message: "Fullname must be at least 2 characters" }),
+  email: z.string().email({ message: "Format email tidak valid" }),
+  username: z.string().min(2, { message: "Username minimal 2 karakter" }),
+  fullName: z.string().min(2, { message: "Nama lengkap minimal 2 karakter" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .refine((value) => regexLowercase.test(value), {
-      message: "Password must contain at least one lowercase letter",
+    .min(8, { message: "Password minimal 8 karakter" })
+    .refine((val) => regexLowercase.test(val), {
+      message: "Password harus mengandung huruf kecil",
     })
-    .refine((value) => regexUppercase.test(value), {
-      message: "Password must contain at least one uppercase letter",
+    .refine((val) => regexUppercase.test(val), {
+      message: "Password harus mengandung huruf besar",
     })
-    .refine((value) => regexDigit.test(value), {
-      message: "Password must contain at least one number",
+    .refine((val) => regexDigit.test(val), {
+      message: "Password harus mengandung angka",
     })
-    .refine((value) => regexSpecialChar.test(value), {
-      message: "Password must contain at least one special character",
+    .refine((val) => regexSpecialChar.test(val), {
+      message: "Password harus mengandung karakter spesial (@$!%*?&)",
     }),
   role: userRoleSchema.optional(),
   status: userStatusSchema.optional(),

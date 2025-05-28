@@ -4,13 +4,13 @@ export type User = {
   username: string;
   fullName: string;
   role: string;
-  status: "active" | "inactive" | null | string;
+  status: "ACTIVE" | "INACTIVE" | "SUSPENDED" | null | string;
 };
 
 export type FilterParams = {
   page?: number;
   limit?: number;
-  status?: "active" | "inactive" | "available" | "out of stock" | undefined;
+  status?: "ACTIVE" | "INACTIVE" | "SUSPENDED" | undefined;
   role?: string;
   categories?: string;
   sortBy?: keyof User;

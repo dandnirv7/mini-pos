@@ -10,10 +10,11 @@ export function getQueryParams(searchParams: URLSearchParams): FilterParams {
   return {
     status:
       (searchParamsCache.get("status") as
-        | "active"
-        | "inactive"
-        | "available"
-        | "out of stock"
+        | "ACTIVE"
+        | "INACTIVE"
+        | "SUSPENDED"
+        | "AVAILABLE"
+        | "OUT_OF_STOCK"
         | undefined) || undefined,
     role: searchParamsCache.get("role") || undefined,
     categories: searchParamsCache.get("categories") || undefined,
