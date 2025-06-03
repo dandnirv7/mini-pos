@@ -25,7 +25,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: `${siteName} Coffee`,
+  title: `${siteName}`,
   description: siteDescription,
   metadataBase: new URL(domainPath),
   keywords: keywords,

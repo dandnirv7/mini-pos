@@ -16,7 +16,7 @@ export const useCheckout = () => {
     },
     onSuccess: (data) => {
       router.push(
-        `/user/checkout/payment?orderNumber=${data.data.orderNumber}`
+        `/user/checkout/payment?order-number=${data.data.orderNumber}`
       );
     },
     onError: (error) => {
