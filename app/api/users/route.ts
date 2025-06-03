@@ -6,7 +6,7 @@ import { ERROR_MESSAGES } from "@/utils/errorMessage";
 import { getQueryParams } from "@/utils/getQueryParams";
 import { hashPassword } from "@/utils/hashPassword";
 import sanitizeData from "@/utils/sanitize";
-import { Prisma } from "@prisma/client";
+import { Prisma, UserStatus, UserRole } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
     const whereCondition: Prisma.UserWhereInput = {
       deletedAt: null,
       AND: [
-        status ? { status: status } : {},
-        role ? { role: role } : {},
+        status ? { status: status?.toUpperCase() as UserStatus } : {},
+        role ? { role: role?.toUpperCase() as UserRole } : {},
         search
           ? {
               OR: [
@@ -67,6 +67,9 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where: whereCondition }),
       prisma.user.findMany({
         where: whereCondition,
+        skip: offset,
+        take: limit,
+        orderBy: sortBy ? { [sortBy]: sortOrder } : undefined,
         select: {
           id: true,
           email: true,
@@ -74,10 +77,14 @@ export async function GET(request: NextRequest) {
           fullName: true,
           role: true,
           status: true,
+          addresses: {
+            select: {
+              id: true,
+              street: true,
+              isPrimary: true,
+            },
+          },
         },
-        skip: offset,
-        take: limit,
-        orderBy: sortBy ? { [sortBy]: sortOrder } : undefined,
       }),
     ]);
 
@@ -145,8 +152,8 @@ export async function POST(request: Request) {
     const user = await prisma.user.create({
       data: {
         ...validatedData,
-        role: validatedData.role || "user",
-        status: "active",
+        role: validatedData.role?.toUpperCase() as UserRole,
+        status: "ACTIVE",
       },
       select: {
         id: true,
@@ -160,7 +167,6 @@ export async function POST(request: Request) {
       {
         success: true,
         data: user,
-        message: "User created successfully",
       },
       { status: 201 }
     );
