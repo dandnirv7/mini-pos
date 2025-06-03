@@ -3,8 +3,15 @@ export const userSelect = {
   email: true,
   username: true,
   fullName: true,
-  status: true,
   role: true,
+  status: true,
+  addresses: {
+    select: {
+      id: true,
+      street: true,
+      isPrimary: true,
+    },
+  },
 };
 
 export const productSelect = {

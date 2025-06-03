@@ -1,12 +1,5 @@
+import { UserRole, UserStatus } from "@prisma/client";
 import { z } from "zod";
-
-export const userStatusSchema = z.enum(["ACTIVE", "INACTIVE"]);
-export const userRoleSchema = z.enum([
-  "SUPERADMIN",
-  "ADMIN",
-  "CASHIER",
-  "USER",
-]);
 
 const regexLowercase = /[a-z]/;
 const regexUppercase = /[A-Z]/;
@@ -32,8 +25,14 @@ export const UserSchema = z.object({
     .refine((val) => regexSpecialChar.test(val), {
       message: "Password harus mengandung karakter spesial (@$!%*?&)",
     }),
-  role: userRoleSchema.optional(),
-  status: userStatusSchema.optional(),
+  role: z
+    .enum(Object.values(UserRole) as [string, ...string[]])
+    .optional()
+    .default("USER"),
+  status: z
+    .enum(Object.values(UserStatus) as [string, ...string[]])
+    .optional()
+    .default("ACTIVE"),
 });
 
 export type UserData = z.infer<typeof UserSchema>;
