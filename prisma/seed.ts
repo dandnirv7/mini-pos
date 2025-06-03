@@ -4,6 +4,8 @@ import {
   PaymentStatus,
   PrismaClient,
   Product,
+  UserRole,
+  UserStatus,
 } from "@prisma/client";
 import bcrypt from "bcrypt";
 
@@ -14,7 +16,7 @@ const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-const roles = ["USER", "ADMIN", "SUPERADMIN", "CASHIER"];
+const roles = [UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN];
 
 async function main() {
   console.log("🚀 Starting seeding process...");
@@ -23,15 +25,19 @@ async function main() {
   await prisma.payment.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
-  await prisma.category.deleteMany();
+
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
+
   await prisma.dailyDiscount.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+
   await prisma.address.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
+  
 
   console.log("👥 Creating users...");
   const users = await Promise.all(
@@ -43,7 +49,7 @@ async function main() {
         i === 0
           ? "admin@example.com"
           : faker.internet.email({ firstName, lastName }).toLowerCase();
-      const role = i === 0 ? "ADMIN" : faker.helpers.arrayElement(roles);
+      const role = i === 0 ? UserRole.ADMIN : faker.helpers.arrayElement(roles);
 
       const user = await prisma.user.create({
         data: {
@@ -55,7 +61,7 @@ async function main() {
           email,
           password,
           role,
-          status: "ACTIVE",
+          status: UserStatus.ACTIVE,
           phoneNumber: faker.phone.number(),
           createdAt: faker.date.past({ years: 1 }),
           updatedAt: faker.date.recent(),
@@ -573,6 +579,20 @@ async function main() {
       where: { userId: user.id },
     });
 
+    // Helper untuk format nomor urut (4 digit, padding)
+    function padNumber(num: number, length: number) {
+      return num.toString().padStart(length, "0");
+    }
+
+    // Helper untuk membuat orderNumber custom
+    function generateOrderNumber(date: Date, index: number): string {
+      const yy = date.getFullYear().toString().slice(-2);
+      const mm = (date.getMonth() + 1).toString().padStart(2, "0");
+      const dd = date.getDate().toString().padStart(2, "0");
+      const paddedIndex = padNumber(index, 4);
+      return `NOKU${yy}${mm}${dd}${paddedIndex}`;
+    }
+
     for (let i = 0; i < orderCount; i++) {
       const orderProducts = faker.helpers.arrayElements(
         products,
@@ -583,9 +603,15 @@ async function main() {
       const deliveryFee = faker.number.float({ min: 5000, max: 20000 });
       const totalAmount = subtotal - discount + deliveryFee;
 
+      const createdAt = faker.date.past({ years: 1 });
+      const updatedAt = faker.date.recent();
+
+      const orderNumber = generateOrderNumber(createdAt, i + 1); // i+1 = order ke-x hari itu
+
       const order = await prisma.order.create({
         data: {
           id: faker.string.uuid(),
+          orderNumber,
           userId: user.id,
           addressId: faker.helpers.arrayElement(userAddresses).id,
           totalAmount,
@@ -604,8 +630,8 @@ async function main() {
             faker.string.alphanumeric(12)
           ),
           customerNotes: faker.helpers.maybe(() => faker.lorem.sentence()),
-          createdAt: faker.date.past({ years: 1 }),
-          updatedAt: faker.date.recent(),
+          createdAt,
+          updatedAt,
           items: {
             create: orderProducts.map((product) => ({
               id: faker.string.uuid(),

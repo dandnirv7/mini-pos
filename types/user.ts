@@ -4,7 +4,7 @@ export type User = {
   username: string;
   fullName: string;
   role: string;
-  status: "active" | "inactive" | null | string;
+  status: "ACTIVE" | "INACTIVE" | null | string;
 };
 
 export type FilterParams = {

@@ -1,13 +1,5 @@
+import { UserRole, UserStatus } from "@prisma/client";
 import { z } from "zod";
-
-const userStatusSchema = z.union([z.literal("active"), z.literal("inactive")]);
-
-const userRoleSchema = z.union([
-  z.literal("superadmin"),
-  z.literal("admin"),
-  z.literal("cashier"),
-  z.literal("user"),
-]);
 
 const regexLowercase = /[a-z]/;
 const regexUppercase = /[A-Z]/;
@@ -37,8 +29,14 @@ export const UserSchema = z.object({
     .refine((value) => regexSpecialChar.test(value), {
       message: "Password must contain at least one special character",
     }),
-  role: userRoleSchema.optional(),
-  status: userStatusSchema.optional(),
+  role: z
+    .enum(Object.values(UserRole) as [string, ...string[]])
+    .optional()
+    .default("USER"),
+  status: z
+    .enum(Object.values(UserStatus) as [string, ...string[]])
+    .optional()
+    .default("ACTIVE"),
 });
 
 export type UserData = z.infer<typeof UserSchema>;
