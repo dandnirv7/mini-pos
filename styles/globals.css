@@ -22,8 +22,8 @@
     --primary: 15 87% 60%; /* Orange utama */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 28 100% 92%;
-    --secondary-foreground: 24 30% 20%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 0%;
 
     --accent: 32 100% 94%;
     --accent-foreground: 24 28% 20%;

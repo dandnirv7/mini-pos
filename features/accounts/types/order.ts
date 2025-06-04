@@ -24,6 +24,12 @@ export interface Address {
   postalCode: string;
 }
 
+export interface Payment {
+  paymentMethod: string;
+  bank: string | null;
+  transactionStatus: string;
+}
+
 export interface OrderDetailResponse {
   orderNumber: string;
   totalAmount: number;
@@ -32,6 +38,7 @@ export interface OrderDetailResponse {
   status: string;
   paymentStatus: string;
   createdAt: string;
+  payment: Payment;
   items: Item[];
   user: User;
   address: Address;

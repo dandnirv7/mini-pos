@@ -24,6 +24,8 @@ export default function PaymentConfirmation() {
 
   const { data: orderData } = useOrder(orderNumber || "");
 
+  console.log(orderData);
+
   return (
     <main>
       <div className="max-w-2xl mx-auto">
@@ -148,10 +150,12 @@ export default function PaymentConfirmation() {
               <Download className="w-4 h-4 mr-2" />
               Download Receipt
             </Button>
-            <Button className="w-full bg-orange-500 sm:w-auto hover:bg-orange-600">
-              <ShoppingBag className="w-4 h-4 mr-2" />
-              Track Order
-            </Button>
+            <Link href={`/orders/${orderNumber}`}>
+              <Button className="w-full bg-orange-500 sm:w-auto hover:bg-orange-600">
+                <ShoppingBag className="w-4 h-4 mr-2" />
+                Track Order
+              </Button>
+            </Link>
             <Button className="w-full sm:w-auto" variant="ghost" asChild>
               <Link href="/">
                 <Home className="w-4 h-4 mr-2" />
