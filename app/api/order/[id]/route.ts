@@ -1,57 +1,46 @@
 import { prisma } from "@/lib/db";
 import { handleError } from "@/utils/errorHandler";
+import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
+
+const secret = process.env.NEXTAUTH_SECRET;
 
 export async function GET(
   req: NextRequest,
   context: { params: { id: string } }
 ) {
   try {
-    if (req.method !== "GET") {
-      return NextResponse.json(
-        { message: "Method Not Allowed" },
-        { status: 405 }
-      );
+    const token = await getToken({ req, secret });
+
+    if (!token) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = context.params;
-    if (!id) {
-      return NextResponse.json(
-        { message: "Order number is required" },
-        { status: 400 }
-      );
-    }
 
     const order = await prisma.order.findUnique({
       where: { orderNumber: id },
       select: {
         orderNumber: true,
+        userId: true,
         totalAmount: true,
-        discount: true,
-        deliveryFee: true,
+        createdAt: true,
         status: true,
         paymentStatus: true,
-        createdAt: true,
-        updatedAt: true,
+        discount: true,
+        deliveryFee: true,
         items: {
           select: {
             id: true,
-            quantity: true,
-            price: true,
             discount: true,
+            price: true,
+            quantity: true,
             product: {
               select: {
                 name: true,
                 imageUrl: true,
               },
             },
-          },
-        },
-        user: {
-          select: {
-            fullName: true,
-            email: true,
-            phoneNumber: true,
           },
         },
         address: {
@@ -62,6 +51,13 @@ export async function GET(
             postalCode: true,
           },
         },
+        user: {
+          select: {
+            fullName: true,
+            email: true,
+            phoneNumber: true,
+          },
+        },
       },
     });
 
@@ -69,7 +65,12 @@ export async function GET(
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data: order }, { status: 200 });
+    // Pastikan order milik user yang sedang login
+    if (order.userId !== token.id) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    return NextResponse.json({ success: true, data: order });
   } catch (error) {
     return handleError(error, "Failed to fetch order details");
   }
