@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 
-export async function generateOrderNumber(): Promise<string> {
+export async function generateOrderNumber(
+  isTracking: boolean = false
+): Promise<string> {
   const now = new Date();
   const year = now.getFullYear().toString().slice(-2);
   const month = (now.getMonth() + 1).toString().padStart(2, "0");
@@ -39,5 +41,7 @@ export async function generateOrderNumber(): Promise<string> {
 
   const sequencePart = sequence.toString().padStart(4, "0");
 
-  return `NOKU${datePart}${sequencePart}`;
+  const prefix = isTracking ? "ORD-" : "NOKU";
+
+  return `${prefix}${datePart}${sequencePart}`;
 }
