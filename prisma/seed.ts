@@ -1,13 +1,14 @@
-import { faker } from "@faker-js/faker";
+import { Faker, id_ID, faker as fakerEn } from "@faker-js/faker";
+
 import {
   OrderStatus,
   PaymentStatus,
   PrismaClient,
-  Product,
   UserRole,
   UserStatus,
 } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
+import { categories, rawProducts } from "./data/products";
 
 const prisma = new PrismaClient();
 
@@ -16,28 +17,29 @@ const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, saltRounds);
 };
 
+const faker = new Faker({ locale: [id_ID] });
+
 const roles = [UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN];
 
 async function main() {
   console.log("🚀 Starting seeding process...");
 
   console.log("🧹 Cleaning up existing data...");
-  await prisma.payment.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
+  // await prisma.payment.deleteMany();
+  // await prisma.orderItem.deleteMany();
+  // await prisma.order.deleteMany();
 
-  await prisma.cartItem.deleteMany();
-  await prisma.cart.deleteMany();
+  // await prisma.cartItem.deleteMany();
+  // await prisma.cart.deleteMany();
 
-  await prisma.dailyDiscount.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
+  // await prisma.dailyDiscount.deleteMany();
+  // await prisma.product.deleteMany();
+  // await prisma.category.deleteMany();
 
-  await prisma.address.deleteMany();
-  await prisma.refreshToken.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.user.deleteMany();
-  
+  // await prisma.address.deleteMany();
+  // await prisma.refreshToken.deleteMany();
+  // await prisma.session.deleteMany();
+  // await prisma.user.deleteMany();
 
   console.log("👥 Creating users...");
   const users = await Promise.all(
@@ -90,30 +92,6 @@ async function main() {
   );
 
   console.log("🏷️ Creating categories...");
-
-  const categories = [
-    {
-      name: "Coffee",
-      slug: "coffee",
-      description: "Premium coffee selections",
-    },
-    { name: "Tea", slug: "tea", description: "Fine tea collections" },
-    {
-      name: "Beans",
-      slug: "beans",
-      description: "Coffee beans from various regions",
-    },
-    {
-      name: "Snacks",
-      slug: "snacks",
-      description: "Delicious snacks to accompany your drink",
-    },
-    {
-      name: "Bundles",
-      slug: "bundles",
-      description: "Special product bundles",
-    },
-  ];
 
   const createdCategories = await Promise.all(
     categories.map((category) =>
@@ -181,346 +159,6 @@ async function main() {
   }
 
   console.log("🛍️ Creating static products...");
-
-  const rawProducts: Omit<
-    Product,
-    "deletedAt" | "imageUrl" | "categoryId" | "weight"
-  >[] = [
-    {
-      id: faker.string.uuid(),
-      name: "House Blend Coffee",
-      slug: "house-blend-coffee",
-      price: 18000,
-      description: "Smooth and balanced house blend coffee.",
-      stock: 100,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Espresso Roast",
-      slug: "espresso-roast",
-      price: 20000,
-      description: "Dark roasted espresso with bold flavor.",
-      stock: 90,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Caramel Macchiato",
-      slug: "caramel-macchiato",
-      price: 25000,
-      description: "Espresso with steamed milk and caramel drizzle.",
-      stock: 80,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Mocha Latte",
-      slug: "mocha-latte",
-      price: 26000,
-      description: "Chocolate flavored coffee with steamed milk.",
-      stock: 70,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Vanilla Cold Brew",
-      slug: "vanilla-cold-brew",
-      price: 24000,
-      description: "Cold brew coffee with vanilla syrup.",
-      stock: 60,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Americano",
-      slug: "americano",
-      price: 17000,
-      description: "Espresso diluted with hot water.",
-      stock: 110,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-
-    {
-      id: faker.string.uuid(),
-      name: "Earl Grey Tea",
-      slug: "earl-grey-tea",
-      price: 15000,
-      description: "Fragrant black tea with bergamot citrus flavor.",
-      stock: 70,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Chamomile Tea",
-      slug: "chamomile-tea",
-      price: 14000,
-      description: "Relaxing herbal tea with chamomile flowers.",
-      stock: 60,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Matcha Latte",
-      slug: "matcha-latte",
-      price: 22000,
-      description: "Smooth Japanese green tea blended with milk.",
-      stock: 50,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Lemongrass Ginger Tea",
-      slug: "lemongrass-ginger-tea",
-      price: 16000,
-      description: "Soothing tea with lemongrass and ginger blend.",
-      stock: 55,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Mint Green Tea",
-      slug: "mint-green-tea",
-      price: 15000,
-      description: "Refreshing green tea with mint leaves.",
-      stock: 60,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Thai Iced Tea",
-      slug: "thai-iced-tea",
-      price: 19000,
-      description: "Sweet and creamy spiced iced tea.",
-      stock: 45,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-
-    {
-      id: faker.string.uuid(),
-      name: "Ethiopian Coffee Beans",
-      slug: "ethiopian-coffee-beans",
-      price: 50000,
-      description: "Premium whole coffee beans from Ethiopia.",
-      stock: 80,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Colombian Coffee Beans",
-      slug: "colombian-coffee-beans",
-      price: 48000,
-      description: "Medium-roast coffee beans from Colombia.",
-      stock: 75,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Sumatra Mandheling Beans",
-      slug: "sumatra-mandheling-beans",
-      price: 52000,
-      description: "Full-bodied beans with low acidity.",
-      stock: 60,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Guatemala Antigua Beans",
-      slug: "guatemala-antigua-beans",
-      price: 51000,
-      description: "Nutty, chocolaty beans with smooth finish.",
-      stock: 55,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Brazil Santos Beans",
-      slug: "brazil-santos-beans",
-      price: 47000,
-      description: "Light, sweet, and balanced coffee beans.",
-      stock: 65,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Kenyan AA Beans",
-      slug: "kenyan-aa-beans",
-      price: 53000,
-      description: "Bright and fruity coffee from Kenya.",
-      stock: 50,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-
-    {
-      id: faker.string.uuid(),
-      name: "Almond Croissant",
-      slug: "almond-croissant",
-      price: 12000,
-      description: "Flaky pastry filled with almond cream.",
-      stock: 60,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Cheese Danish",
-      slug: "cheese-danish",
-      price: 13000,
-      description: "Soft pastry with sweet cream cheese filling.",
-      stock: 55,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Chocolate Muffin",
-      slug: "chocolate-muffin",
-      price: 11000,
-      description: "Rich and moist chocolate muffin.",
-      stock: 70,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Banana Bread",
-      slug: "banana-bread",
-      price: 12500,
-      description: "Soft banana-flavored cake loaf.",
-      stock: 65,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Butter Croissant",
-      slug: "butter-croissant",
-      price: 10000,
-      description: "Classic French croissant with buttery layers.",
-      stock: 75,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Oatmeal Cookie",
-      slug: "oatmeal-cookie",
-      price: 9000,
-      description: "Crunchy oat cookies with raisins.",
-      stock: 85,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-
-    {
-      id: faker.string.uuid(),
-      name: "Morning Combo Bundle",
-      slug: "morning-combo-bundle",
-      price: 30000,
-      description: "Coffee and croissant combo to start your day.",
-      stock: 40,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Afternoon Tea Set",
-      slug: "afternoon-tea-set",
-      price: 32000,
-      description: "Tea and snacks set for a relaxing break.",
-      stock: 35,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Family Coffee Pack",
-      slug: "family-coffee-pack",
-      price: 90000,
-      description: "Large pack of mixed coffee for the family.",
-      stock: 20,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Travel Kit Bundle",
-      slug: "travel-kit-bundle",
-      price: 45000,
-      description: "Portable coffee and snacks for on-the-go.",
-      stock: 30,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "Coffee & Beans Bundle",
-      slug: "coffee-beans-bundle",
-      price: 75000,
-      description: "Fresh brew with a pack of beans included.",
-      stock: 25,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-    {
-      id: faker.string.uuid(),
-      name: "All Day Starter Pack",
-      slug: "all-day-starter-pack",
-      price: 85000,
-      description: "Full-day pack with drinks and snacks.",
-      stock: 15,
-      status: "AVAILABLE",
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-  ];
 
   const productsWithCategory = rawProducts.map((product) => ({
     ...product,
@@ -605,8 +243,7 @@ async function main() {
 
       const createdAt = faker.date.past({ years: 1 });
       const updatedAt = faker.date.recent();
-
-      const orderNumber = generateOrderNumber(createdAt, i + 1); // i+1 = order ke-x hari itu
+      const orderNumber = generateOrderNumber(createdAt, i + 1);
 
       const order = await prisma.order.create({
         data: {
@@ -622,19 +259,51 @@ async function main() {
             Object.values(PaymentStatus)
           ),
           shippingMethod: faker.helpers.arrayElement([
-            "Standard",
-            "Express",
-            "Next Day",
+            "NOKU Standard",
+            "NOKU Express",
+            "NOKU Same Day",
+            "NOKU Next Day",
           ]),
           trackingNumber: faker.helpers.maybe(() =>
             faker.string.alphanumeric(12)
           ),
-          customerNotes: faker.helpers.maybe(() => faker.lorem.sentence()),
+          customerNotes: faker.helpers.maybe(() => fakerEn.lorem.sentence()),
           createdAt,
           updatedAt,
-          items: {
-            create: orderProducts.map((product) => ({
+        },
+      });
+
+      // Create shipping
+      const shipping = await prisma.shipping.create({
+        data: {
+          id: faker.string.uuid(),
+          orderId: order.id,
+          addressId: order.addressId,
+          shippingFee: deliveryFee,
+          trackingNumber: faker.string.alphanumeric(12),
+          estimateDelivery: faker.date.soon({ days: 3, refDate: createdAt }),
+          method: faker.helpers.arrayElement([
+            "Standard",
+            "Express",
+            "Next Day",
+          ]),
+          status: faker.helpers.arrayElement([
+            "PENDING",
+            "SHIPPED",
+            "DELIVERED",
+          ]),
+          createdAt,
+          updatedAt,
+        },
+      });
+
+      // Create order items
+      await Promise.all(
+        orderProducts.map((product) =>
+          prisma.orderItem.create({
+            data: {
               id: faker.string.uuid(),
+              orderId: order.id,
               productId: product.id,
               quantity: faker.number.int({ min: 1, max: 3 }),
               price: product.price,
@@ -642,13 +311,57 @@ async function main() {
                 min: 0,
                 max: product.price * 0.2,
               }),
-            })),
-          },
-        },
-      });
+            },
+          })
+        )
+      );
 
+      // Create timeline
+      const timelines = await Promise.all([
+        prisma.orderTimeline.create({
+          data: {
+            id: faker.string.uuid(),
+            orderId: order.id,
+            status: "Order Placed",
+            description: "Your order has been placed.",
+            date: createdAt,
+          },
+        }),
+        prisma.orderTimeline.create({
+          data: {
+            id: faker.string.uuid(),
+            orderId: order.id,
+            status: "Processing",
+            description: "Your order is being processed.",
+            date: faker.date.soon({ days: 0.5, refDate: createdAt }),
+          },
+        }),
+        prisma.orderTimeline.create({
+          data: {
+            id: faker.string.uuid(),
+            orderId: order.id,
+            status: "Shipped",
+            description: "Your order has been shipped.",
+            date: faker.date.soon({ days: 1, refDate: createdAt }),
+          },
+        }),
+        prisma.orderTimeline.create({
+          data: {
+            id: faker.string.uuid(),
+            orderId: order.id,
+            status: "Delivered",
+            description: "Your order has been delivered.",
+            date: faker.helpers.maybe(() =>
+              faker.date.soon({ days: 2, refDate: createdAt })
+            ),
+          },
+        }),
+      ]);
+
+      // Create payment if status is PAID
+      let payment = null;
       if (order.paymentStatus === "PAID") {
-        await prisma.payment.create({
+        payment = await prisma.payment.create({
           data: {
             id: faker.string.uuid(),
             orderId: order.id,
@@ -658,33 +371,40 @@ async function main() {
               "e_wallet",
             ]),
             transactionId: faker.string.alphanumeric(16),
-            transactionTime: order.createdAt,
+            transactionTime: createdAt,
             transactionStatus: "settlement",
-            grossAmount: order.totalAmount,
+            grossAmount: totalAmount,
             fraudStatus: "accept",
             currency: "IDR",
             bank: faker.helpers.arrayElement(["bca", "bni", "bri", "mandiri"]),
             vaNumber: faker.helpers.maybe(() =>
-              faker.finance.accountNumber(16)
+              fakerEn.finance.accountNumber(16)
             ),
             cardType: faker.helpers.maybe(() =>
               faker.helpers.arrayElement(["visa", "mastercard"])
             ),
             maskedCard: faker.helpers.maybe(() =>
-              faker.finance.creditCardNumber()
+              fakerEn.finance.creditCardNumber()
             ),
             approvalCode: faker.helpers.maybe(() =>
               faker.string.alphanumeric(8)
             ),
-            settlementTime: faker.date.soon({
-              days: 1,
-              refDate: order.createdAt,
-            }),
-            createdAt: order.createdAt,
-            updatedAt: order.updatedAt,
+            settlementTime: faker.date.soon({ days: 1, refDate: createdAt }),
+            createdAt,
+            updatedAt,
           },
         });
       }
+
+      // Update order with foreign keys
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          shippingId: shipping.id,
+          paymentId: payment?.id ?? undefined,
+          orderTimelineId: timelines[0].id, // Optional main timeline
+        },
+      });
     }
   }
 

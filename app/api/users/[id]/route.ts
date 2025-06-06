@@ -142,6 +142,14 @@ export async function handler(
               NOT: { id },
               deletedAt: null,
             },
+            include: {
+              addresses: {
+                omit: {
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              },
+            },
           });
 
           if (checkDuplicate) {
