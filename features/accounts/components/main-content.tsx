@@ -17,6 +17,12 @@ import { UserHeader } from "./header";
 import { MenuSection } from "./menu-section";
 import { SpecialDiscountSection } from "./spesial-dicsount";
 
+interface Addresses {
+  id: string;
+  street: string;
+  isPrimary: boolean;
+}
+
 const LoadingFallback = () => <p>Loading...</p>;
 const ErrorState = () => <p>Error loading products.</p>;
 
@@ -26,9 +32,19 @@ const ProductDisplay = ({ userId }: { userId: string }) => {
   const { data: productResponse, isError } = useProducts({ limit: 30 });
   const { data: userResponse } = useUserById(userId);
 
+  const getAddress = (addresses: Addresses[] = []) => {
+    if (!addresses) return null;
+
+    const filteredAddress = addresses?.filter(
+      (address) => address.isPrimary === true
+    );
+    return filteredAddress[0];
+  };
+
+  const address = getAddress(userResponse?.addresses) || undefined;
+
   if (isError) return <ErrorState />;
 
-  const addressId = userResponse?.addresses?.[0]?.id || "";
   const cartItemsLength = cartItems.length;
   const productList: Product[] = productResponse?.product || [];
 
@@ -55,7 +71,7 @@ const ProductDisplay = ({ userId }: { userId: string }) => {
         <div className="lg:col-span-1">
           <OrderSummary
             userId={userId}
-            selectedAddressId={addressId}
+            address={address}
             cartItems={cartItems}
             specialItems={specialItems}
           />

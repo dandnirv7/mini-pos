@@ -9,8 +9,15 @@ import Link from "next/link";
 import placeholder from "@/public/placeholder.png";
 import toRupiahs from "@/utils/formatCurrency";
 
+interface Address {
+  id: string;
+  street: string;
+  isPrimary: boolean;
+}
+
 type Props = {
   displayedUser: string;
+  address: Address;
   cartItems: CartItemData[];
   specialItems: DiscountItem[];
   deliveryFee: number;
@@ -26,6 +33,7 @@ type Props = {
 
 export const OrderSummaryView = ({
   displayedUser,
+  address,
   cartItems,
   deliveryFee,
   subtotal,
@@ -55,7 +63,7 @@ export const OrderSummaryView = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Delivery Address</p>
-              <p>123 Coffee Street, Jakarta</p>
+              <p>{address?.street}, Jakarta</p>
             </div>
             <Link href="/user/settings">
               <Button variant="ghost" className="h-auto text-[#F26E41]">

@@ -8,11 +8,17 @@ import { OrderSummaryView } from "./order-summary-view";
 import { CartItemData, DiscountItem } from "@/features/accounts/types/product";
 import { calculateCartSummary } from "../../utils/calculatePrice";
 
+interface Address {
+  id: string;
+  street: string;
+  isPrimary: boolean;
+}
+
 type OrderSummaryProps = {
   userId: string;
   cartItems: CartItemData[];
   specialItems: DiscountItem[];
-  selectedAddressId: string;
+  address?: Address;
   deliveryFee?: number;
 };
 
@@ -20,11 +26,13 @@ export const OrderSummary = ({
   userId,
   cartItems,
   specialItems,
-  selectedAddressId,
+  address,
   deliveryFee = 15000,
 }: OrderSummaryProps) => {
   const { data: session } = useSession();
   const displayedUser = session?.user?.fullName || "Guest";
+
+  const selectedAddressId = address?.id || null;
 
   const { mutate: checkout, isPending } = useCheckout();
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +57,7 @@ export const OrderSummary = ({
   return (
     <OrderSummaryView
       displayedUser={displayedUser}
+      address={address!}
       cartItems={cartItems}
       specialItems={specialItems}
       deliveryFee={deliveryFee}

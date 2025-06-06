@@ -10,7 +10,15 @@ import {
 } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 0,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
 
 export function Providers({ children, ...props }: ThemeProviderProps) {
   return (

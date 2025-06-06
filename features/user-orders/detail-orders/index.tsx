@@ -123,7 +123,7 @@ export default function OrderDetailsPage() {
               className="bg-secondary hover:bg-gray-50"
               asChild
             >
-              <Link href={`/user/orders/tracking/${order?.orderNumber}`}>
+              <Link href={`/user/tracking/${order?.orderNumber}`}>
                 Track Order
               </Link>
             </Button>
