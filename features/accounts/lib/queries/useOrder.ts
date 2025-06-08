@@ -1,27 +1,20 @@
-import { axiosInstance } from "@/utils/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
-import { OrderDetailResponse } from "@/features/accounts/types/order";
 import { ApiResponse } from "@/features/accounts/types";
+import { axiosInstance } from "@/utils/axiosInstance";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { type OrderItem } from "../../types";
 
-const fetchOrder = async (
-  orderNumber: string
-): Promise<OrderDetailResponse> => {
-  const response = await axiosInstance.get<ApiResponse<OrderDetailResponse>>(
-    `/api/order/${orderNumber}`
+const fetchOrder = async (): Promise<OrderItem[]> => {
+  const response = await axiosInstance.get<ApiResponse<OrderItem[]>>(
+    `/api/order`
   );
   return response.data.data;
 };
 
-const useOrder = (orderNumber?: string) => {
+const useOrder = () => {
   return useQuery({
-    queryKey: ["order", orderNumber],
-    queryFn: () => {
-      if (!orderNumber) {
-        throw new Error("Order number is required");
-      }
-      return fetchOrder(orderNumber);
-    },
-    enabled: !!orderNumber,
+    queryKey: ["order"],
+    queryFn: fetchOrder,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 };

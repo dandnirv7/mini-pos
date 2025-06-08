@@ -5,6 +5,7 @@ export const userSelect = {
   fullName: true,
   role: true,
   status: true,
+  createdAt: true,
   addresses: {
     select: {
       id: true,

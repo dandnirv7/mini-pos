@@ -18,8 +18,17 @@ export async function GET(
 
     const { id } = context.params;
 
-    const order = await prisma.order.findUnique({
-      where: { orderNumber: id },
+    const order = await prisma.order.findFirst({
+      where: {
+        OR: [
+          {
+            id,
+          },
+          {
+            orderNumber: id,
+          },
+        ],
+      },
       select: {
         orderNumber: true,
         userId: true,

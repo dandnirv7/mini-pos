@@ -13,6 +13,7 @@ export async function middleware(req: NextRequest) {
   const isAuthPage =
     pathname.startsWith("/login") || pathname.startsWith("/register");
   const isHomePage = pathname === "/";
+  const isSettingsPage = pathname.startsWith("/user/settings");
 
   const isAdmin = token?.role === "ADMIN";
   const isUser = token?.role === "USER";
@@ -50,6 +51,10 @@ export async function middleware(req: NextRequest) {
 
   if (isOverviewPage) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  if (isSettingsPage && isUser) {
+    return NextResponse.redirect(new URL("/user/settings/profile", req.url));
   }
 
   return NextResponse.next();

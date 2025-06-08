@@ -1,20 +1,21 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/utils/axiosInstance";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import {
-  ApiResponse,
-  DiscountParams,
-  Product,
-} from "@/features/accounts/types/product";
+import { ApiResponse, DiscountParams, DiscountProduct } from "../../types";
 
-type DiscountProduct = {
-  id: string;
-  productId: string;
-  discount: number;
-  startDate: string | Date;
-  endDate: string;
-  createdAt: string;
-  product: Product;
+const fetchSpecialDiscountProducts = async (
+  params?: DiscountParams
+): Promise<DiscountProduct[]> => {
+  try {
+    const response = await axiosInstance.get<ApiResponse<DiscountProduct[]>>(
+      "/api/daily-discount",
+      { params: { ...params, today: params?.today ? "true" : undefined } }
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error("[FetchDiscount] Error:", error);
+    throw error;
+  }
 };
 
 export function useSpecialDiscountProducts(params?: DiscountParams) {
@@ -28,19 +29,3 @@ export function useSpecialDiscountProducts(params?: DiscountParams) {
     refetchOnWindowFocus: false,
   });
 }
-
-const fetchSpecialDiscountProducts = async (
-  params?: DiscountParams
-): Promise<DiscountProduct[]> => {
-  try {
-    console.log("[FetchDiscount] Request params:", params);
-    const response = await axiosInstance.get<ApiResponse<DiscountProduct[]>>(
-      "/api/daily-discount",
-      { params: { ...params, today: params?.today ? "true" : undefined } }
-    );
-    return response.data.data;
-  } catch (error) {
-    console.error("[FetchDiscount] Error:", error);
-    throw error;
-  }
-};

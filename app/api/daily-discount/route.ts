@@ -49,10 +49,41 @@ export async function GET(req: NextRequest) {
       prisma.dailyDiscount.count({ where }),
     ]);
 
+    const calculateDiscountedPrice = (
+      priceProduct: number,
+      discountPercentage: number
+    ): number => {
+      if (
+        priceProduct <= 0 ||
+        discountPercentage < 0 ||
+        discountPercentage > 100
+      ) {
+        throw new Error("Invalid price or discount percentage");
+      }
+
+      const discounted = priceProduct * (1 - discountPercentage / 100);
+      return Math.round(discounted);
+    };
+
+    const response = discounts.map((discount) => ({
+      id: discount.product.id,
+      name: discount.product.name,
+      slug: discount.product.slug,
+      description: discount.product.description,
+      price: discount.product.price,
+      discountPercentage: Math.round(discount.discount),
+      discountedPrice: calculateDiscountedPrice(
+        discount.product.price,
+        discount.discount
+      ),
+      imageUrl: discount.product.imageUrl,
+      stock: discount.product.stock,
+    }));
+
     return NextResponse.json({
       success: true,
       message: "Daily discounts fetched successfully",
-      data: discounts,
+      data: response,
       meta: {
         page,
         limit,

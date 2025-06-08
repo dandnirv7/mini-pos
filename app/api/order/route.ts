@@ -37,6 +37,54 @@ export async function GET(req: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
+      select: {
+        id: true,
+        orderNumber: true,
+        userId: true,
+        totalAmount: true,
+        createdAt: true,
+        status: true,
+        paymentStatus: true,
+        discount: true,
+        deliveryFee: true,
+        items: {
+          select: {
+            id: true,
+            discount: true,
+            price: true,
+            quantity: true,
+            product: {
+              select: {
+                name: true,
+                imageUrl: true,
+              },
+            },
+          },
+        },
+        address: {
+          select: {
+            street: true,
+            city: true,
+            state: true,
+            postalCode: true,
+          },
+        },
+        user: {
+          select: {
+            fullName: true,
+            email: true,
+            phoneNumber: true,
+          },
+        },
+        shipping: {
+          select: {
+            trackingNumber: true,
+            estimateDelivery: true,
+            method: true,
+            status: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({ success: true, data: orders }, { status: 200 });
