@@ -1,7 +1,8 @@
+"use client";
+
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 
 export const getSessionUser = async () => {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession();
   return session?.user ?? null;
 };
