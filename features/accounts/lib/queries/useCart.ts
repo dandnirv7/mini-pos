@@ -1,11 +1,11 @@
 import { ApiResponse } from "@/types";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
-import { CartType } from "../../types";
+import { Cart } from "../../types";
 
-const fetchCart = async (): Promise<CartType> => {
+const fetchCart = async (): Promise<Cart> => {
   try {
-    const res = await axiosInstance.get<ApiResponse<CartType>>("/api/cart");
+    const res = await axiosInstance.get<ApiResponse<Cart>>("/api/cart");
     return res.data.data;
   } catch (error) {
     console.error("Error fetching cart:", error);
@@ -14,9 +14,9 @@ const fetchCart = async (): Promise<CartType> => {
 };
 
 export const useCart = () => {
-  return useQuery<CartType>({
+  return useQuery<Cart>({
     queryKey: ["cart"],
     queryFn: fetchCart,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 };

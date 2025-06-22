@@ -31,7 +31,7 @@ export default function QuickStats() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-500">Total Spent</p>
               <p className="text-2xl font-bold text-gray-900">
-                {toRupiahs(isNaN(Number(totalSpent)) ? 0 : Number(totalSpent))}
+                {toRupiahs(totalSpent ?? 0)}
               </p>
             </div>
           </div>

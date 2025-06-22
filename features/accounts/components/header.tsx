@@ -1,11 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useCart } from "../lib/queries/useCart";
 import UserAvatarDropdown from "./avatar-dropdown";
-import { useUserStore } from "../lib/stores/userStore";
 
 const navLinks = [
   { href: "/user", label: "Dashboard" },
@@ -15,7 +15,7 @@ const navLinks = [
 ];
 
 export default function Header() {
-  const { cart } = useUserStore();
+  const { data: cart } = useCart();
 
   const cartItems = cart?.items ?? [];
 

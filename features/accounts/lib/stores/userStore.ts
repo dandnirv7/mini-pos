@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { CartType, OrderItem } from "../../types";
+import { Cart, OrderItem } from "../../types";
 
 interface FrequentlyProductItem {
   id: string;
@@ -12,14 +12,14 @@ interface FrequentlyProductItem {
 }
 
 type UserState = {
-  username?: string;
+  firstName?: string;
   email?: string;
   phone?: string;
-  totalSpent: string;
+  totalSpent: number;
   userSince?: string;
   userOrder: OrderItem[];
   frequentlyBought: FrequentlyProductItem[];
-  cart: CartType | null;
+  cart: Cart | null;
   setUserInfo: (data: Partial<UserState>) => void;
   resetUser: () => void;
 };
@@ -27,21 +27,25 @@ type UserState = {
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      username: "",
+      firstName: "",
       email: "",
       phone: "",
-      totalSpent: "0",
+      totalSpent: 0,
       userSince: "",
       userOrder: [],
       frequentlyBought: [],
       cart: null,
-      setUserInfo: (data) => set((state) => ({ ...state, ...data })),
+      setUserInfo: (data) =>
+        set((state) => ({
+          ...state,
+          ...data,
+        })),
       resetUser: () =>
         set({
-          username: "",
+          firstName: "",
           email: "",
           phone: "",
-          totalSpent: "0",
+          totalSpent: 0,
           userSince: "",
           userOrder: [],
           frequentlyBought: [],
@@ -51,7 +55,7 @@ export const useUserStore = create<UserState>()(
     {
       name: "user-storage",
       partialize: (state) => ({
-        username: state.username,
+        firstName: state.firstName,
         email: state.email,
         phone: state.phone,
         totalSpent: state.totalSpent,

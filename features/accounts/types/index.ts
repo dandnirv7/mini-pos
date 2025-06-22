@@ -3,11 +3,16 @@ export type ApiResponse<T> = {
   status: string;
 };
 
+// =====================
+// User-related Types
+// =====================
+
 export interface User {
   id: string;
   email: string;
   username?: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   role?: string;
   status?: string;
   createdAt?: string;
@@ -24,40 +29,24 @@ export interface Address {
   isPrimary?: boolean;
 }
 
-export interface OrderItem {
-  id: string;
-  orderNumber: string;
-  userId: string;
-  totalAmount: number;
-  createdAt: string;
-  status: string;
-  paymentStatus: string;
-  discount: number;
-  deliveryFee: number;
-  items: Item[];
-  address: Address;
-  user: User;
-  shipping: Shipping;
-}
-
-export interface Shipping {
-  trackingNumber: string;
-  estimateDelivery: Date;
-  method: string;
-  status: string;
-}
-
-export interface Item {
-  id: string;
-  discount: number;
-  price: number;
-  quantity: number;
-  product: Product;
-}
+// =====================
+// Product Types
+// =====================
 
 export interface Product {
+  id: string;
   name: string;
+  slug: string;
+  categoryId: string;
+  price: number;
+  description: string;
   imageUrl: string | null;
+  status: string;
+  stock: number;
+  weight: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
 }
 
 export interface DiscountProduct {
@@ -78,3 +67,58 @@ export type DiscountParams = {
   order?: "asc" | "desc";
   today?: string;
 };
+
+// =====================
+// Order Types
+// =====================
+
+export interface OrderItem {
+  id: string;
+  orderNumber: string;
+  userId: string;
+  totalAmount: number;
+  createdAt: string;
+  status: string;
+  paymentStatus: string;
+  discount: number;
+  deliveryFee: number;
+  items: Item[];
+  address: Address;
+  user: User;
+  shipping: Shipping;
+}
+
+export interface Item {
+  id: string;
+  discount: number;
+  price: number;
+  quantity: number;
+  product: Product;
+}
+
+export interface Shipping {
+  trackingNumber: string;
+  estimateDelivery: Date;
+  method: string;
+  status: string;
+}
+
+// =====================
+// Cart Types
+// =====================
+
+export interface Cart {
+  id: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  items: CartItem[];
+}
+
+export interface CartItem {
+  id: string;
+  cartId: string;
+  productId: string;
+  quantity: number;
+  product: Product;
+}

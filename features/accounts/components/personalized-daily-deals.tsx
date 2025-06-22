@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CountdownTimer from "../components/countdown-timer";
 import ProductCard from "../components/product-card";
 import { useProductsStore } from "../lib/stores/productsStore";
+import { Cart } from "../types";
 
-export default function PersonalizedDailyDeals() {
+export default function PersonalizedDailyDeals({ cart }: { cart: Cart }) {
   const { personalizedProducts } = useProductsStore();
 
+  const cartItems = cart?.items;
   return (
     <Card className="bg-secondary">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -30,6 +32,7 @@ export default function PersonalizedDailyDeals() {
             <div key={product.id} className="relative">
               <ProductCard
                 product={product}
+                cartItems={cartItems}
                 dealBadge={
                   <div className="absolute space-y-1 top-3 left-3">
                     <Badge className="block bg-primary hover:bg-primary/90">

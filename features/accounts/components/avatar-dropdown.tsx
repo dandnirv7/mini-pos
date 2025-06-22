@@ -14,15 +14,18 @@ import Link from "next/link";
 import { useUserStore } from "../lib/stores/userStore";
 
 function handleLogout() {
+  const resetUser = useUserStore.getState().resetUser;
+
+  resetUser();
   useUserStore.persist.clearStorage();
   signOut();
 }
 
 export default function UserAvatarDropdown() {
-  const { username, email } = useUserStore();
+  const { firstName, email } = useUserStore();
 
   const initials =
-    username
+    firstName
       ?.split(" ")
       .map((n) => n[0])
       .join("") ?? "";
@@ -32,7 +35,7 @@ export default function UserAvatarDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative w-8 h-8 rounded-full">
           <Avatar className="w-8 h-8">
-            <AvatarImage src={""} alt={username} />
+            <AvatarImage src={""} alt={firstName} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </Button>
@@ -40,7 +43,7 @@ export default function UserAvatarDropdown() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{username}</p>
+            <p className="text-sm font-medium leading-none">{firstName}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {email}
             </p>
